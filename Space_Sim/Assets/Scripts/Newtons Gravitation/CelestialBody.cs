@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class CelestialBody : MonoBehaviour{
 
-public float mass;
+public float surfaceGravity;
+public float radius;
 public Vector3 initialVelocity;
-Vector3 currentVelocity;
 
-void Awake(){currentVelocity = initialVelocity;}
+Vector3 currentVelocity;
+float mass;
+
+void Awake()
+    {
+        currentVelocity = initialVelocity;
+        mass = (radius * radius * surfaceGravity) / Universe.gravitationalConstant;
+    }
 
 public void UpdateVelocity(CelestialBody[] allBodies, float timeStep)                                                               //NBodySim will activate this function
 {

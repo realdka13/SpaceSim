@@ -21,7 +21,7 @@ public class OrbitDebugDisplay : MonoBehaviour {
         public VirtualBody(CelestialBody body) {
             position = body.transform.position;
             velocity = body.initialVelocity;
-            mass = body.mass;
+            mass = (body.radius * body.radius * body.surfaceGravity) / Universe.gravitationalConstant;
         }
     }
 
