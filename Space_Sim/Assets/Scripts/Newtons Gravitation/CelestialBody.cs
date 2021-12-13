@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
+[RequireComponent (typeof (Rigidbody))]
 public class CelestialBody : MonoBehaviour{
 
 public float surfaceGravity;
@@ -10,6 +12,12 @@ public Vector3 initialVelocity;
 
 Vector3 currentVelocity;
 float mass;
+
+void OnValidate ()
+    {
+        mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
+        GetComponent<Transform>().localScale = new Vector3(radius * 2, radius * 2, radius * 2);
+    }
 
 void Awake()
     {
