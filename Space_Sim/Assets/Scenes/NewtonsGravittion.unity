@@ -266,8 +266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878cd2e25ecaf76469ba025ac4137c49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceGravity: 50
-  radius: 500
+  surfaceGravity: 10
+  radius: 100
   initialVelocity: {x: 0, y: 0, z: 0}
 --- !u!135 &895524191
 SphereCollider:
@@ -341,7 +341,7 @@ Transform:
   m_GameObject: {fileID: 895524188}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1000, y: 1000, z: 1000}
+  m_LocalScale: {x: 200, y: 200, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -480,9 +480,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878cd2e25ecaf76469ba025ac4137c49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceGravity: 1
-  radius: 10
-  initialVelocity: {x: -100, y: 0, z: 0}
+  surfaceGravity: 0.1
+  radius: 5
+  initialVelocity: {x: -15, y: 0, z: 0}
 --- !u!135 &1685139836
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -554,8 +554,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1685139833}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -175.5, y: 7.0603075, z: 1424}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalPosition: {x: -34.9, y: 7.0603075, z: 796}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -618,11 +618,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01ebb8400839c2c458fe14d078fba2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numSteps: 50000
+  numSteps: 100000
   timeStep: 0.01
-  usePhysicsTimeStep: 1
+  usePhysicsTimeStep: 0
   relativeToBody: 1
-  centralBody: {fileID: 1766835850}
+  centralBody: {fileID: 895524190}
   width: 100
   useThickLines: 0
 --- !u!1 &1766835848
@@ -674,9 +674,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878cd2e25ecaf76469ba025ac4137c49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceGravity: 10
-  radius: 100
-  initialVelocity: {x: -100, y: 0, z: 0}
+  surfaceGravity: 5
+  radius: 50
+  initialVelocity: {x: -20, y: 0, z: 0}
 --- !u!135 &1766835851
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -748,8 +748,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1766835848}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 7.0603075, z: 1652}
-  m_LocalScale: {x: 200, y: 200, z: 200}
+  m_LocalPosition: {x: -3, y: 7.0603075, z: 305}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
