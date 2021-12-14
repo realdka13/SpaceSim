@@ -28,7 +28,7 @@ public class OnRailsObject : MonoBehaviour
     [SerializeField] [Range(0f,1)] float lineWidth = .25f;
 
     [Space]
-    [SerializeField] OnRailsReferenceBody referenceBody;
+    [SerializeField] RailBodyProperties referenceBody;
     LineRenderer lineRender;
 
     //Numbers which only change if orbit or mass changes
