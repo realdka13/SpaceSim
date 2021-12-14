@@ -25,7 +25,7 @@ public class OnRailsObject : MonoBehaviour
     [Header("Orbit Drawing")]
     [SerializeField] bool redrawEveryFrame = false;    //Useful for bodies such as moons which orbit around a planet that is orbiting another body
     [SerializeField] int orbitResolution = 50;
-    [SerializeField] [Range(0f,1)] float lineWidth = .25f;
+    [SerializeField] [Range(0f,10)] float lineWidth = .25f;
 
     [Space]
     [SerializeField] RailBodyProperties referenceBody;
@@ -99,7 +99,7 @@ public class OnRailsObject : MonoBehaviour
     void CalculateSemiConstants()
     {
         //For Calculating mean anomaly
-        mu = Universe.G * referenceBody.mass;                       //Standard Gravitational Paramter
+        mu = Universe.gravitationalConstant * referenceBody.mass;                       //Standard Gravitational Paramter
         n = Mathf.Sqrt(mu / Mathf.Pow(semiMajorAxis, 3));           //Mean Angular Motion n=sqrt(mu/a^3)
 
         //For Calculating true anomaly

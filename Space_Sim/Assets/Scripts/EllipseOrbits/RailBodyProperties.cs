@@ -11,12 +11,12 @@ public class RailBodyProperties : MonoBehaviour
 
     void Awake()
     {
-        mass = (radius * radius * surfaceGravity) / Universe.G;
+        mass = (radius * radius * surfaceGravity) / Universe.gravitationalConstant;
     }
 
     void OnValidate ()
     {
-        mass = surfaceGravity * radius * radius / Universe.G;
+        mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
         GetComponent<Transform>().localScale = new Vector3(radius * 2, radius * 2, radius * 2);
     }
 }
