@@ -24,6 +24,11 @@ private void Awake()
 
 void Update() 
 {
+    //Focus Body
+    if(Input.GetKeyDown("space"))
+    {
+        focusedBody = bodies[bodiesIndex];
+    }
 
     //Set Camera position
     cam.transform.position = focusedBody.transform.position;

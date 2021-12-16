@@ -54,7 +54,7 @@ public static class Icosphere
         return i;
     }
 
-    public static void Create(GameObject gameObject)
+    public static void Create(GameObject gameObject, int recursionLevel, out int vertexCount, out int triCount)
     {
         MeshFilter filter = gameObject.GetComponent<MeshFilter>();
         Mesh mesh = filter.mesh;
@@ -63,7 +63,6 @@ public static class Icosphere
         List<Vector3> vertList = new List<Vector3>();
         Dictionary<long, int> middlePointIndexCache = new Dictionary<long, int>();
 
-        int recursionLevel = 5;
         float radius = 1f;
 
         // create 12 vertices of a icosahedron
@@ -159,5 +158,8 @@ public static class Icosphere
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
         //mesh.Optimize();
+
+        vertexCount = vertList.Count;
+        triCount = faces.Count;
     }
 }

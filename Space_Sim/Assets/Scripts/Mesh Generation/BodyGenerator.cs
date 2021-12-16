@@ -4,45 +4,32 @@ using UnityEngine;
 
 public class BodyGenerator : MonoBehaviour
 {
-    public Material planetMaterial;
-    public float planetSize = 1f;
-    GameObject planet;
-    Mesh planetMesh;
-    Vector3[] planetVertices;
-    int[] planetTriangles;
-    MeshRenderer planetMeshRenderer;
-    MeshFilter planetMeshFilter;
-    MeshCollider planetMeshCollider;
+    public int subdivisions = 0;
+    public float bodySize = 1f;
+    public Material bodyMaterial;
 
+    [Space]
+    public int vertexCount;
+    public int triangleCount;
 
-    private void Start()
+    GameObject body;
+    Mesh bodyMesh;
+    MeshRenderer bodyMeshRenderer;
+    MeshFilter bodyMeshFilter;
+    MeshCollider bodyMeshCollider;
+
+    public void CreatebodyGameObject()
     {
-        CreatePlanet();
-    }
+        body = new GameObject();
+        body.name = "New Icosphere";
 
+        bodyMeshFilter = body.AddComponent<MeshFilter>();
+        bodyMesh = bodyMeshFilter.mesh;
+        bodyMeshRenderer = body.AddComponent<MeshRenderer>();
+        bodyMeshRenderer.material = bodyMaterial;
 
-    public void CreatePlanet()
-    {
-        CreatePlanetGameObject();
-        RecalculateMesh();
-    }
+        body.transform.localScale = new Vector3(bodySize, bodySize, bodySize);
 
-    void CreatePlanetGameObject()
-    {
-        planet = new GameObject();
-        planet.name = "New Icosphere";
-        planetMeshFilter = planet.AddComponent<MeshFilter>();
-        planetMesh = planetMeshFilter.mesh;
-        planetMeshRenderer = planet.AddComponent<MeshRenderer>();
-        planetMeshRenderer.material = planetMaterial;
-        planet.transform.localScale = new Vector3(planetSize, planetSize, planetSize);
-        Icosphere.Create(planet);
-    }
-
-    void RecalculateMesh()
-    {
-        planetMesh.RecalculateBounds();
-        planetMesh.RecalculateTangents();
-        planetMesh.RecalculateNormals();
+        Icosphere.Create(body, subdivisions, out vertexCount, out triangleCount);
     }
 }
