@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RailBodyProperties : MonoBehaviour
+public class BodyProperties : MonoBehaviour
 {
     [SerializeField]  public float surfaceGravity;
-    [SerializeField]  public float radius;
+    [SerializeField]  public float radius = .5f;
 
     [HideInInspector] public float mass;
 

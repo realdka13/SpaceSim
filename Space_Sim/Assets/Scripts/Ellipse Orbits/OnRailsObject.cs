@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LineRenderer))]
 public class OnRailsObject : MonoBehaviour
 {
 
@@ -28,7 +29,7 @@ public class OnRailsObject : MonoBehaviour
     [SerializeField] [Range(0f,10)] float lineWidth = .25f;
 
     [Space]
-    [SerializeField] RailBodyProperties referenceBody;
+    [SerializeField] BodyProperties referenceBody;
     LineRenderer lineRender;
 
     //Numbers which only change if orbit or mass changes

@@ -6,8 +6,8 @@ public class MouseController : MonoBehaviour
 {
 //Bodies
 int bodiesIndex = 0;
-[SerializeField] RailBodyProperties[] bodies;
-public RailBodyProperties focusedBody;
+[SerializeField] BodyProperties[] bodies;
+public BodyProperties focusedBody;
 
 //Camera Control
 [Header("Camera Controls")]
@@ -64,11 +64,11 @@ void Update()
     //Allow Zooming in and out
     if (Input.GetAxis("Mouse ScrollWheel") > 0f ) // forward
     {
-        cameraOffest += scrollSpeed;
+        cameraOffest -= scrollSpeed;
     }
     else if (Input.GetAxis("Mouse ScrollWheel") < 0f ) // backwards
     {
-        cameraOffest -= scrollSpeed;
+        cameraOffest += scrollSpeed;
     }
 
 }
