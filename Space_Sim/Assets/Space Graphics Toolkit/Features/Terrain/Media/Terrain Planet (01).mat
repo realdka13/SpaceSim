@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Terrain Planet (01)
   m_Shader: {fileID: 4800000, guid: 768a73c8cfe57ab46943868314e13a32, type: 3}
-  m_ShaderKeywords: SGT_A _BAKEDDETAIL _BAKEDDETAIL_ON _BAKEDDETAIL_ON_DEF_1 _DETAIL
-    _DETAIL_NORMAL _DETAIL_R _NORMALMAP _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  m_ShaderKeywords: _BAKEDDETAIL_ON _BAKEDDETAIL_ON_DEF_1 _DETAIL_NORMAL _DETAIL_R
+    _SHORE_DETAIL_A
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -188,6 +188,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ShoreAlbedo:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShoreMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _WaterBumpMap:
         m_Texture: {fileID: 2800000, guid: a4a96292a1acf604cb1aa94a20081081, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -208,6 +216,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AlbedoShift: 0
     - _BakedDetailFadeRange: 100
@@ -268,7 +277,9 @@ Material:
     - _NightSharpness: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _ShoreNoiseTiling: 100
     - _ShoreRange: 10
+    - _Shore_Detail: 0
     - _Smoothness: 1
     - _SmoothnessTextureChannel: 1
     - _SpecularHighlights: 1
@@ -296,3 +307,4 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _NightDirection: {r: 0, g: 0, b: 1, a: 1}
     - _WaterColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

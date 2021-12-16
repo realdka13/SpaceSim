@@ -91,6 +91,7 @@ Material:
         m_Texture: {fileID: 2800000, guid: eae9289f9badd094ab1a71f9859ed8c9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _Age: 294.4
     - _Brightness: 1
@@ -121,8 +122,8 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Strength: 1
-    - _SunspotsStrength: 0.97
-    - _SunspotsWarp: 0.001
+    - _SunspotsStrength: 0.88
+    - _SunspotsWarp: -0.03
     - _TimeScale: 10
     - _UVSec: 0
     - _ZWrite: 1
@@ -136,3 +137,4 @@ Material:
     - _NoiseTex_Step: {r: 23, g: 29, b: 31, a: 1}
     - _RimColor: {r: 1, g: 0.48377472, b: 0, a: 1}
     - _SunspotsColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
