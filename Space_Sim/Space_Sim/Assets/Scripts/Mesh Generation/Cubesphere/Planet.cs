@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Planet : MonoBehaviour {
+public class Planet : MonoBehaviour
+{
 
-    [Range(2,256)]
+    [Range(2, 256)]
     public int resolution = 10;
     public bool autoUpdate = true;
-    public enum FaceRenderMask {All, Top, Bottom, Left, Right, Front, Back};
+    public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back };
     public FaceRenderMask faceRenderMask;
 
     public ShapeSettings shapeSettings;
@@ -19,17 +20,17 @@ public class Planet : MonoBehaviour {
     public bool colourSettingsFoldout;
 
     ShapeGenerator shapeGenerator = new ShapeGenerator();
-    ColorGenerator colorGenerator = new ColorGenerator();
+    ColourGenerator colourGenerator = new ColourGenerator();
 
     [SerializeField, HideInInspector]
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
-     
 
-	void Initialize()
+
+    void Initialize()
     {
         shapeGenerator.UpdateSettings(shapeSettings);
-        colorGenerator.UpdateSettings(colourSettings);
+        colourGenerator.UpdateSettings(colourSettings);
 
         if (meshFilters == null || meshFilters.Length == 0)
         {
@@ -53,7 +54,7 @@ public class Planet : MonoBehaviour {
             meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial = colourSettings.planetMaterial;
 
             terrainFaces[i] = new TerrainFace(shapeGenerator, meshFilters[i].sharedMesh, resolution, directions[i]);
-            bool renderFace = faceRenderMask == FaceRenderMask.All || (int)faceRenderMask -1 == i;
+            bool renderFace = faceRenderMask == FaceRenderMask.All || (int)faceRenderMask - 1 == i;
             meshFilters[i].gameObject.SetActive(renderFace);
         }
     }
@@ -85,27 +86,25 @@ public class Planet : MonoBehaviour {
 
     void GenerateMesh()
     {
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
-            if(meshFilters[i].gameObject.activeSelf)
+            if (meshFilters[i].gameObject.activeSelf)
             {
                 terrainFaces[i].ConstructMesh();
             }
         }
 
-        colorGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
-
+        colourGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
     }
 
     void GenerateColours()
     {
-
-        colorGenerator.UpdateColors();
-        for(int i = 0; i < 6; i++)
+        colourGenerator.UpdateColours();
+        for (int i = 0; i < 6; i++)
         {
-            if(meshFilters[i].gameObject.activeSelf)
+            if (meshFilters[i].gameObject.activeSelf)
             {
-                terrainFaces[i].UpdateUVs(colorGenerator);
+                terrainFaces[i].UpdateUVs(colourGenerator);
             }
         }
     }
