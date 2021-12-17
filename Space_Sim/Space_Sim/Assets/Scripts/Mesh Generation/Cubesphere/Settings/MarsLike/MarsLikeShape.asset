@@ -12,5 +12,68 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5150fd26d71b0114da734f53b133cccd, type: 3}
   m_Name: MarsLikeShape
   m_EditorClassIdentifier: 
-  planetRadius: 1
-  noiseLayers: []
+  planetRadius: 2
+  noiseLayers:
+  - enabled: 1
+    useFirstLayerAsMask: 0
+    noiseSettings:
+      filterType: 0
+      simpleNoiseSettings:
+        strength: 0.02
+        numLayers: 2
+        baseRoughness: 9.3
+        roughness: 0.49
+        persistence: 0.94
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0
+      rigidNoiseSettings:
+        strength: 0.35
+        numLayers: 2
+        baseRoughness: 1.83
+        roughness: 0
+        persistence: 0
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0.78
+        weightMultiplier: 0
+  - enabled: 1
+    useFirstLayerAsMask: 0
+    noiseSettings:
+      filterType: 1
+      simpleNoiseSettings:
+        strength: 0.07
+        numLayers: 5
+        baseRoughness: 1.83
+        roughness: 0.21
+        persistence: -0.03
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0.78
+      rigidNoiseSettings:
+        strength: 0.07
+        numLayers: 5
+        baseRoughness: 1.83
+        roughness: 0
+        persistence: 0
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0.78
+        weightMultiplier: 0
+  - enabled: 1
+    useFirstLayerAsMask: 1
+    noiseSettings:
+      filterType: 0
+      simpleNoiseSettings:
+        strength: 0.11
+        numLayers: 8
+        baseRoughness: 3.1
+        roughness: 1.41
+        persistence: 1.07
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0
+      rigidNoiseSettings:
+        strength: 3.34
+        numLayers: 4
+        baseRoughness: 3.03
+        roughness: 0
+        persistence: 0
+        centre: {x: 0, y: 0, z: 0}
+        minValue: 0.78
+        weightMultiplier: 0
