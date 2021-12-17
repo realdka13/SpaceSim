@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09e2fdf5d5dac8648b671a3dcc861f6b, type: 3}
-  m_Name: ColorSettings
+  m_Name: EarthLikeColor
   m_EditorClassIdentifier: 
   planetMaterial: {fileID: 2100000, guid: d6570cc21b41742188eca71a4bb8d9e7, type: 2}
   biomeColorSettings:
