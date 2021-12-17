@@ -25,6 +25,9 @@ public class Planet : MonoBehaviour {
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
      
+private void Start() {
+    GeneratePlanet();
+}
 
 	void Initialize()
     {
