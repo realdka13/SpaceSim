@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainFace {
+public class TerrainFace
+{
 
     ShapeGenerator shapeGenerator;
     Mesh mesh;
@@ -27,7 +28,7 @@ public class TerrainFace {
         Vector3[] vertices = new Vector3[resolution * resolution];
         int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
         int triIndex = 0;
-        Vector2[] uv = (mesh.uv.Length == vertices.Length) ? mesh.uv: new Vector2[vertices.Length];
+        Vector2[] uv = (mesh.uv.Length == vertices.Length)?mesh.uv:new Vector2[vertices.Length];
 
         for (int y = 0; y < resolution; y++)
         {
@@ -76,8 +77,8 @@ public class TerrainFace {
 
                 uv[i].x = colorGenerator.BiomePercentFromPoint(pointOnUnitSphere);
             }
-            mesh.uv = uv;
         }
+        mesh.uv = uv;
     }
 
 }
