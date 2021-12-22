@@ -8,6 +8,11 @@ public class PlayerMovement : MonoBehaviour
 {
     public float playerSpeed = 5f;
 
+    //Grounding
+    public float groundDistance = .25f;
+    private bool grounded = false;
+    private int layerMask;
+
     //Moving
     private Vector2 moveVal;
     private Vector3 moveDirection;
@@ -24,13 +29,22 @@ public class PlayerMovement : MonoBehaviour
     {
         playerBody = GetComponent<Rigidbody>();
         //attractorMass = attractorBody.GetComponent<BodyProperties>().mass;
+        layerMask = ~LayerMask.GetMask("Player");
     }
 
+    private void Update()
+    {
+        
+        grounded = Physics.CheckSphere(transform.position - transform.up ,groundDistance, layerMask);
+    }
 
     private void FixedUpdate()
     {
-        //Move Player
-        playerBody.AddForce(moveDirection.normalized * (playerSpeed * 10f), ForceMode.Acceleration);
+        if (grounded)
+        {
+            //Move Player
+            playerBody.AddForce(moveDirection.normalized * (playerSpeed * 10f), ForceMode.Acceleration);
+        }
 
         //Gravity
         gravityForce = 9.8f;//(Universe.gravitationalConstant * attractorMass) / Vector3.Distance(attractorBody.transform.position, transform.position);
@@ -43,4 +57,11 @@ public class PlayerMovement : MonoBehaviour
         moveVal = value.Get<Vector2>();
         moveDirection = transform.forward * moveVal.y + transform.right * moveVal.x;
     }
+
+/*     void OnDrawGizmos()
+    {
+        // Draw a black sphere at the transform's position
+        Gizmos.color = Color.black;
+        Gizmos.DrawSphere(transform.position - transform.up, groundDistance);
+    } */
 }
