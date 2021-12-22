@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LineRenderer))]
 public class OnRailsObject : MonoBehaviour
 {
 
@@ -23,14 +22,14 @@ public class OnRailsObject : MonoBehaviour
     [SerializeField] float accuracyTolerance = 1e-6f;
     [SerializeField] int maxIterations = 5;           //usually converges after 3-5 iterations.
 
-    [Header("Orbit Drawing")]
-    [SerializeField] bool redrawEveryFrame = false;    //Useful for bodies such as moons which orbit around a planet that is orbiting another body
-    [SerializeField] int orbitResolution = 50;
-    [SerializeField] [Range(0f,10)] float lineWidth = .25f;
+    //[Header("Orbit Drawing")]
+    //[SerializeField] bool redrawEveryFrame = false;    //Useful for bodies such as moons which orbit around a planet that is orbiting another body
+    //[SerializeField] int orbitResolution = 50;
+    //[SerializeField] [Range(0f,10)] float lineWidth = .25f;
 
-    [Space]
+    //[Space]
     [SerializeField] BodyProperties referenceBody;
-    LineRenderer lineRender;
+    //LineRenderer lineRender;
 
     //Numbers which only change if orbit or mass changes
     [HideInInspector] [SerializeField] float mu, n, trueAnomalyConstant, cosLOAN, sinLOAN, sinI, cosI; //
@@ -39,7 +38,7 @@ public class OnRailsObject : MonoBehaviour
     void Awake()
     {
         CalculateSemiConstants();
-        DrawOrbit();
+        //DrawOrbit();
     }
 
     void Update()
@@ -91,10 +90,10 @@ public class OnRailsObject : MonoBehaviour
 
         transform.position = new Vector3(x, y, z) + referenceBody.transform.position;
 
-        if(redrawEveryFrame)
+/*         if(redrawEveryFrame)
         {
             DrawOrbit();
-        }
+        } */
     }
 
     void CalculateSemiConstants()
@@ -113,7 +112,7 @@ public class OnRailsObject : MonoBehaviour
         sinI = Mathf.Sin(inclination);
     }
 
-    void DrawOrbit()
+/*     void DrawOrbit()
     {
         //CalculateSemiConstants must always be called before this
         Vector3[] orbitalPoints = new Vector3[orbitResolution + 1];
@@ -153,7 +152,7 @@ public class OnRailsObject : MonoBehaviour
             lineRender.positionCount = orbitResolution + 1;
             lineRender.SetPositions(orbitalPoints);
         }
-    }
+    } */
 
     void RecalculateBodyPosition()
     {
@@ -181,6 +180,6 @@ public class OnRailsObject : MonoBehaviour
     {
         CalculateSemiConstants();
         RecalculateBodyPosition();
-        DrawOrbit();
+        //DrawOrbit();
     }
 }
