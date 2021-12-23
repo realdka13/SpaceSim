@@ -8,27 +8,57 @@ public class Planet : MonoBehaviour
 //Mesh filter stores the mesh data
 //Mesh renderer actually draws it on the screen
 
-[Range(2,256)]
-public int resolution = 10;
-
-[SerializeField, HideInInspector]   //Will make sure the mesh filters are saved in the editor
+    [SerializeField, HideInInspector]   //Will make sure the mesh filters are saved in the editor
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
 
-    Vector3[] cardinalDirections = {Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back};
-    
-    private void OnValidate()
+    //For LOD
+    public static float size = 10; // Must be set to the size of the planet defined in the inspector
+
+    public static Transform player;
+
+    /*
+    LOD detail levels, modify this to figure out what works
+    {LODLevel, player distance}
+    */
+    public static Dictionary<int, float> detailLevelDistances = new Dictionary<int, float>()
     {
+        {0, Mathf.Infinity},
+        {1, 60f},
+        {2, 25f},
+        {3, 10f},
+        {4, 4f},
+        {5, 1.5f},
+        {6, .7f},
+        {7, .3f},
+        {8, .1f}
+    };
+    
+    private void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform; // Slow, but that doesn't really matter in this case
+
         Initialize();
         GenerateMesh();
+
+        StartCoroutine(PlanetGenerationLoop());
     }
 
 
-
-
-
-
-
+    /* Only update the planet once per second
+    Other possible improvements include:
+    1: Only updating once the player has moved far enough to be able to cause a noticable change in the LOD
+    2: Only displaying chunks that are in sight
+    3: Not recreating chunks that already exist */
+    private IEnumerator PlanetGenerationLoop()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(1f);
+            GenerateMesh();
+        }
+    }
+    
 
 
 
@@ -41,7 +71,9 @@ public int resolution = 10;
         {
             meshFilters = new MeshFilter[6]; //Storage Array for Mesh Filters
         }
-            terrainFaces = new TerrainFace[6];   //Storage array for all terrain faces
+        terrainFaces = new TerrainFace[6];   //Storage array for all terrain faces
+
+        Vector3[] cardinalDirections = {Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back};
 
         for (int i = 0; i < 6; i++) //Creating 6 Quads as Gameobjects
         {
@@ -56,16 +88,19 @@ public int resolution = 10;
             }
 
             //Calculate Meshes
-            terrainFaces[i] = new TerrainFace(meshFilters[i].sharedMesh, resolution, cardinalDirections[i]);
+            terrainFaces[i] = new TerrainFace(meshFilters[i].sharedMesh, 4, cardinalDirections[i], size);
         }
     }
-
-    //This method actually calculates the meshes
+    
+    
+    
+    
+    // Generates the mesh. The generation is done from scratch every time it's called, which could be improved
     void GenerateMesh()
     {
         foreach (TerrainFace face in terrainFaces)
         {
-            face.Constructmesh();
+            face.ConstructTree();
         }
     }
 
