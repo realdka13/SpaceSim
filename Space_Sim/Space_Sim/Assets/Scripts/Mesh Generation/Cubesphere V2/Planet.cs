@@ -13,7 +13,7 @@ public class Planet : MonoBehaviour
     TerrainFace[] terrainFaces;
 
     //For LOD
-    public static float size = 10; // Must be set to the size of the planet defined in the inspector
+    public static float size = 1; // Must be set to the size of the planet defined in the inspector
 
     public static Transform player;
 

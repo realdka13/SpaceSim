@@ -177,7 +177,7 @@ public class Chunk
                 //2: the offset is scaled using the radius variable
                 Vector3 pointOnUnitCube = position + ((percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB) * radius;
 
-                /***Convert to Sphere*** https://catlikecoding.com/unity/tutorials/cube-sphere/
+                //***Convert to Sphere*** https://catlikecoding.com/unity/tutorials/cube-sphere/
                 float px = pointOnUnitCube.x;
                 float py = pointOnUnitCube.y;
                 float pz = pointOnUnitCube.z;
@@ -186,10 +186,10 @@ public class Chunk
                 pointOnUnitSphere.x = px * Mathf.Sqrt(1f - ((py*py)/2) - ((pz*pz)/2) + (((py*py)*(pz*pz))/3));
                 pointOnUnitSphere.y = py * Mathf.Sqrt(1f - ((px*px)/2) - ((pz*pz)/2) + ((px*px)*(pz*pz)/3));
                 pointOnUnitSphere.z = pz * Mathf.Sqrt(1f - ((px*px)/2) - ((py*py)/2) + ((px*px)*(py*py)/3));
-                //***********************/
+                //***********************
 
                 //*** TODO change to my vert distribution
-                Vector3 pointOnUnitSphere = pointOnUnitCube.normalized * Planet.size;
+                pointOnUnitSphere = pointOnUnitSphere * Planet.size;
 
                 vertices[i] = pointOnUnitSphere;
 
