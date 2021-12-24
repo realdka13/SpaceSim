@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/*
-*** TODO Change name to quad tree? ***
-*/
-public class TerrainFace
+public class QuadTree
 {
     Mesh mesh;
 
@@ -27,11 +24,10 @@ public class TerrainFace
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    //Constructor *** TODO radius is redundant? ***
-    public TerrainFace(Mesh mesh, int resolution, Vector3 localUp, float radius, Planet planetScript)
+    //Constructor *** TODO radius and planetscript.radius is redundant? ***
+    public QuadTree(Mesh mesh, Vector3 localUp, float radius, Planet planetScript)
     {
         this.mesh = mesh;
-        this.resolution = resolution;
         this.localUp = localUp;
         this.radius = radius;
         this.planetScript = planetScript;

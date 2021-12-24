@@ -10,10 +10,14 @@ public class Chunk
     //Planet Details
     public Vector3 position;
     public float radius;
+
+    //LOD
     public int detailLevel;
+    int maxDetail;
+    int resolution;
 
     //Objects
-    public Chunk parent; //Unused ** TODO delete? ***
+    public Chunk parent; //Unused
     public Chunk[] children;
 
     //Axes https://academo.org/demos/3d-vector-plotter/ to visualize
@@ -30,12 +34,21 @@ public class Chunk
     // Constructor
     public Chunk(Planet planetScript, Chunk[] children, Chunk parent, Vector3 position, float radius, int detailLevel, Vector3 localUp, Vector3 axisA, Vector3 axisB)
     {
+        //Planet
         this.planetScript = planetScript;
-        this.children = children;
-        this.parent = parent;   //Unused
+
+        //Planet Details
         this.position = position;
         this.radius = radius;
+
+        //LOD
         this.detailLevel = detailLevel;
+        this.maxDetail = planetScript.detailLevelDistances.Length;
+        this.resolution = planetScript.LOD0Resolution;
+
+        //Objects
+        this.parent = parent;   //Unused
+        this.children = children;
 
         //Find axis A and B
         this.localUp = localUp;
@@ -46,10 +59,8 @@ public class Chunk
 
     public void GenerateChildren()
     {
-        int maxDetail = 8;
-
-        //If detail level is under max level and above 0. Max level is defined in Planets *** TODO change max detail level hard coding ***
-        if(detailLevel <= maxDetail && detailLevel >= 0)
+        //If detail level is under max level and above 0. Max level is defined in Planets
+        if(detailLevel <= maxDetail - 1 && detailLevel >= 0)
         {
             if (Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position) <= planetScript.detailLevelDistances[detailLevel])
             {
@@ -75,10 +86,10 @@ public class Chunk
 
     public void UpdateChunk()
     {
-        float distanceToPlayer = Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position);
-        if(detailLevel <= 8)
+        float distancePlayerFromCenter = Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position);
+        if(detailLevel <= maxDetail - 1)
         {
-            if (distanceToPlayer > planetScript.detailLevelDistances[detailLevel])
+            if (distancePlayerFromCenter > planetScript.detailLevelDistances[detailLevel])
             {
                 children = new Chunk[0];
             }
@@ -113,11 +124,10 @@ public class Chunk
                 toBeRendered.AddRange(child.GetVisableChildren());
             }
         }
-        else                                  //If chunk doesn't have children, decide if it should even be visable
+        else                                    //If chunk doesn't have children, decide if it should even be visable
         {
-            if (Mathf.Acos((Mathf.Pow(planetScript.radius, 2) + Mathf.Pow(planetScript.distanceToPlayer, 2) - 
-                Mathf.Pow(Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position), 2)) / 
-                (2 * planetScript.radius * planetScript.distanceToPlayer)) < planetScript.cullingMinAngle)
+            float playerVertexAngle = Mathf.Acos((Mathf.Pow(planetScript.radius, 2) + Mathf.Pow(planetScript.distancePlayerFromCenter, 2) - Mathf.Pow(Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position), 2)) / (2 * planetScript.radius * planetScript.distancePlayerFromCenter));
+            if (playerVertexAngle < planetScript.cullingMinAngle * Mathf.Deg2Rad)
             {
                 toBeRendered.Add(this);
             }
@@ -128,24 +138,21 @@ public class Chunk
 
 
     //Return triangles including offset
-    public int[] GetTrianglesWithOffset(int triangleIndex)
+    public int[] GetTrianglesWithOffset(int triangleOffset)
     {
         int[] triangles = new int[this.triangles.Length];
 
         for (int i = 0; i < triangles.Length; i++)
         {
-            triangles[i] = this.triangles[i] + triangleIndex;
+            triangles[i] = this.triangles[i] + triangleOffset;
         }
-
         return triangles;
     }
 
 
     //This method calculates the verts and tris
-    public (Vector3[], int[]) CalculateVerticesAndTriangles(int triangleIndex)
+    public (Vector3[], int[]) CalculateVerticesAndTriangles(int triangleOffset)
     {
-        int resolution = 9; // The resolution of the chunk. Can be changed but must be odd // *** TODO why odd? and this should be connected to the same on the planet and terrain face
-
         //Vert and Tri arrays
         Vector3[] vertices = new Vector3[resolution * resolution]; //Total verts = resolution^2
         int[] triangles = new int[((resolution - 1) * (resolution - 1)) * 6]; //Think about this array as triangle vertex Indecies. (res - 1)^2 is number of faces, * 2 triangles per face, * 3 vertices per triangle
@@ -161,12 +168,15 @@ public class Chunk
                 int i = x + y * resolution; //Keeps track of which index we are on in the vertices array
                 Vector2 percent = new Vector2(x, y) / (resolution - 1); //Tells us how close to completion each side is, can be used to decide position of each vertex
 
-                //2 Big differences here *** TODO understand this ***
+                //2 Big differences here
                 //1: The origin is the position variable rather than the middle of the terrain face
                 //2: the offset is scaled using the radius variable
                 Vector3 pointOnUnitCube = position + ((percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB) * radius;
 
-                /***Convert to Sphere*** https://catlikecoding.com/unity/tutorials/cube-sphere/
+                /*** TODO Reimplement this math/is it needed? ***
+                //***Convert to Sphere***
+                https://catlikecoding.com/unity/tutorials/cube-sphere/
+
                 float px = pointOnUnitCube.x;
                 float py = pointOnUnitCube.y;
                 float pz = pointOnUnitCube.z;
@@ -175,10 +185,9 @@ public class Chunk
                 pointOnUnitSphere.x = px * Mathf.Sqrt(1f - ((py*py)/2) - ((pz*pz)/2) + (((py*py)*(pz*pz))/3));
                 pointOnUnitSphere.y = py * Mathf.Sqrt(1f - ((px*px)/2) - ((pz*pz)/2) + ((px*px)*(pz*pz)/3));
                 pointOnUnitSphere.z = pz * Mathf.Sqrt(1f - ((px*px)/2) - ((py*py)/2) + ((px*px)*(py*py)/3));
-                //***********************/
 
                 //pointOnUnitSphere = pointOnUnitSphere * planetScript.radius;
-                // *** TODO Reimplement this math ***
+                //***********************/
 
                 Vector3 pointOnUnitSphere = pointOnUnitCube.normalized * planetScript.radius; // Inflate the cube by projecting the vertices onto a sphere with the radius of Planet.radius
 
@@ -208,7 +217,7 @@ public class Chunk
         this.vertices = vertices;
         this.triangles = triangles;
 
-        return (vertices, GetTrianglesWithOffset(triangleIndex));
+        return (vertices, GetTrianglesWithOffset(triangleOffset));
     }
 
 }

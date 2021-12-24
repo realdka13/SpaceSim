@@ -2,41 +2,64 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO Show Mesh in the Editor
+//TODO Make LOD update more efficient? Like if player hasnt moved, dont bother checking every chunk
+//TODO reduce culling angle as player gets closer to the planet
 //TODO Save this data to a scriptable object
+    //TODO Need to make sure there arnt too many meshes on the planet on properties reset
+
+
 public class Planet : MonoBehaviour
 {
     //Meshes
     [SerializeField, HideInInspector]
     MeshFilter[] meshFilters;
-    TerrainFace[] terrainFaces;
-
-    //LODs
-    public int startResolution = 9; // *** TODO Play with this and see what it does **
-    public float radius = 1000; //Must be set to the size of the planet defined in the inspector *** TODO impliment this better/reflect changes in the editor***
-    public float cullingMinAngle = 1.91986218f; //90 degrees for now *** TODO reduce this as the player gets closer to the planet surface ***
+    QuadTree[] tree;
 
     //Player Info
+    [HideInInspector]
     public Transform player;
-    public float distanceToPlayer;
+    //[HideInInspector]
+    public float distancePlayerFromCenter;              //Used for culling math
 
-   //Hardcoded Detail Levels *** TODO add possibility to add more levels (have chunk auto get max)
-    public float[] detailLevelDistances = new float[] {
-        Mathf.Infinity,
-        6000f,
-        2500f,
-        1000f,
-        400f,
-        150f,
-        70f,
-        30f,
-        10f
+    [Header("Planet parameters")]
+    public float radius = 1000;                 //Size of the planet
+
+    //LODs
+    [Space, Header("LOD Parameters")]
+    public float updateFrequency = .1f;         //Update frequency of LOD chunks
+    public int LOD0Resolution = 9;              //Resolution of LOD0, reccomended odd, 11 is the max for up to LOD8
+    public float cullingMinAngle = 90f; //Angle in Degrees from player to vertex to cull
+
+    //LOD Levels
+    [Space]
+    public float[] detailLevelDistances = new float[] { //1 Square is subdivided into 4 at every LOD level
+        Mathf.Infinity, //LOD0
+        6000f,          //LOD1
+        2500f,          //LOD2
+        1000f,          //LOD3
+        400f,           //LOD4
+        150f,           //LOD5
+        70f,            //LOD6
+        30f,            //LOD7
+        10f             //LOD8
+    };
+
+    public float[,] cullingAngles = {
+    {Mathf.Infinity, 90f},
+    {6000f, 80f}, 
+    {2000f, 60f},
+    {1500f, 45f},
+    {1000, 30f},
+    {500, 20f},
+    {100f, 10f},
     };
     
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;// Slow, but that doesn't really matter in this case *** TODO Improve this ***
+        player = GameObject.FindGameObjectWithTag("Player").transform;
 
         Initialize();
         GenerateMesh();
@@ -46,20 +69,27 @@ public class Planet : MonoBehaviour
 
     private void Update()
     {
-        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
     }
 
-
-    /* Only update the planet once per second
-    Other possible improvements include:
-    1: Only updating once the player has moved far enough to be able to cause a noticable change in the LOD */
     private IEnumerator PlanetGenerationLoop()
     {
         GenerateMesh();
 
         while(true)
         {
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(updateFrequency);
+
+            distancePlayerFromCenter = Vector3.Distance(transform.position, player.position);
+            float distancePlayerFromSurface = distancePlayerFromCenter - radius;
+            for(int i = cullingAngles.GetLength(0) - 1; i >= 0; i--)
+            {
+                if(distancePlayerFromSurface < cullingAngles[i,0])
+                {
+                    cullingMinAngle = cullingAngles[i,1];
+                    break;
+                }
+            }
             UpdateMesh();
         }
     }
@@ -72,7 +102,7 @@ public class Planet : MonoBehaviour
         {
             meshFilters = new MeshFilter[6];                                                                           //Storage Array for Mesh Filters
         }
-        terrainFaces = new TerrainFace[6];                                                                             //Storage array for all terrain faces
+        tree = new QuadTree[6];                                                                                        //Storage array for all terrain faces
 
         Vector3[] cardinalDirections = {Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back};
 
@@ -89,27 +119,26 @@ public class Planet : MonoBehaviour
             }
 
             //Calculate Meshes
-            terrainFaces[i] = new TerrainFace(meshFilters[i].sharedMesh, startResolution, cardinalDirections[i], radius, this);
+            tree[i] = new QuadTree(meshFilters[i].sharedMesh, cardinalDirections[i], radius, this);
         }
     }
-    
     
     
     //Generates a new mesh
     void GenerateMesh()
     {
-        foreach (TerrainFace face in terrainFaces)
+        foreach (QuadTree branch in tree)
         {
-            face.ConstructTree();
+            branch.ConstructTree();
         }
     }
 
     //Updates the current mesh
     void UpdateMesh()
     {
-        foreach (TerrainFace face in terrainFaces)
+        foreach (QuadTree branch in tree)
         {
-            face.UpdateTree();
+            branch.UpdateTree();
         }
     }
 }
