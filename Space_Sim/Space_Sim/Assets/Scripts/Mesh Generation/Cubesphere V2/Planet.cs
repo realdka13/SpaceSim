@@ -4,36 +4,36 @@ using UnityEngine;
 
 public class Planet : MonoBehaviour
 {
-//Mesh is the data, set of vertices
-//Mesh filter stores the mesh data
-//Mesh renderer actually draws it on the screen
-
     [SerializeField, HideInInspector]   //Will make sure the mesh filters are saved in the editor
     MeshFilter[] meshFilters;
     TerrainFace[] terrainFaces;
 
     //For LOD
-    public static float size = 1; // Must be set to the size of the planet defined in the inspector
+    public int startResolution = 9;
+    public float size = 1000; // Must be set to the size of the planet defined in the inspector *** TODO impliment this better***
+    public float cullingMinAngle = 1.91986218f; //90 degrees for now *** TODO reduce this as the player gets closer to the planet surface ***
 
-    public static Transform player;
+    //Player details
+    public Transform player;
+    public float distanceToPlayer;
 
-    /*
-    LOD detail levels, modify this to figure out what works
-    {LODLevel, player distance}
-    */
-    public static Dictionary<int, float> detailLevelDistances = new Dictionary<int, float>()
-    {
-        {0, Mathf.Infinity},
-        {1, 60f},
-        {2, 25f},
-        {3, 10f},
-        {4, 4f},
-        {5, 1.5f},
-        {6, .7f},
-        {7, .3f},
-        {8, .1f}
+   // Hardcoded detail levels. First value is level, second is distance from player. Finding the right values can be a little tricky
+    public float[] detailLevelDistances = new float[] {
+        Mathf.Infinity,
+        6000f,
+        2500f,
+        1000f,
+        400f,
+        150f,
+        70f,
+        30f,
+        10f
     };
     
+    
+
+
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform; // Slow, but that doesn't really matter in this case
@@ -44,6 +44,11 @@ public class Planet : MonoBehaviour
         StartCoroutine(PlanetGenerationLoop());
     }
 
+    private void Update()
+    {
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+    }
+
 
     /* Only update the planet once per second
     Other possible improvements include:
@@ -52,15 +57,15 @@ public class Planet : MonoBehaviour
     3: Not recreating chunks that already exist */
     private IEnumerator PlanetGenerationLoop()
     {
+        GenerateMesh();
+
         while(true)
         {
-            yield return new WaitForSeconds(1f);
-            GenerateMesh();
+            yield return new WaitForSeconds(.1f);
+            UpdateMesh();
         }
     }
     
-
-
 
 
 
@@ -88,7 +93,7 @@ public class Planet : MonoBehaviour
             }
 
             //Calculate Meshes
-            terrainFaces[i] = new TerrainFace(meshFilters[i].sharedMesh, 4, cardinalDirections[i], size);
+            terrainFaces[i] = new TerrainFace(meshFilters[i].sharedMesh, startResolution, cardinalDirections[i], size, this);
         }
     }
     
@@ -104,4 +109,12 @@ public class Planet : MonoBehaviour
         }
     }
 
+
+    void UpdateMesh()
+    {
+        foreach (TerrainFace face in terrainFaces)
+        {
+            face.UpdateTree();
+        }
+    }
 }
