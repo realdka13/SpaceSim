@@ -4,6 +4,7 @@ using UnityEngine;
 
 //TODO Show Mesh in the Editor
 //TODO The player movement check might cause problems with floating origin
+//TODO Mesh Generation code could use some refactoring
 
 public class Planet : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class Planet : MonoBehaviour
 
     //LODs
     private float updateFrequency = .1f;         //Update frequency of LOD chunks
+    [Header("Change in Edit Mode Only")]
     public bool enableLOD = true;
     [HideInInspector]
     public int LOD0Resolution = 9;              //Resolution of LOD0, reccomended odd, 11 is the max for up to LOD8
@@ -148,14 +150,5 @@ public class Planet : MonoBehaviour
         {
             branch.UpdateTree();
         }
-    }
-
-    public void GeneratePlanet()
-    {
-        radius = planetSettings.radius;
-        detailLevelDistances = lodSettings.detailLevelDistances;
-        cullingAngle = lodSettings.cullingAngle;
-        Initialize();
-        GenerateMesh();
     }
 }

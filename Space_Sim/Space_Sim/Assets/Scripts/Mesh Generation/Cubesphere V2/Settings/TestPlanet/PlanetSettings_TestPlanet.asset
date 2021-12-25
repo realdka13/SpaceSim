@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae95ed1972ec04345ab0847e79000d6b, type: 3}
   m_Name: PlanetSettings_TestPlanet
   m_EditorClassIdentifier: 
-  radius: 1000
+  radius: 1500

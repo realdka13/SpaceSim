@@ -20,21 +20,14 @@ public class PlanetEditor : Editor
 
     void DrawSettingsEditor(Object settings, ref bool foldout, ref Editor editor)
     {
-        using (var check = new EditorGUI.ChangeCheckScope())
+        if(settings != null)
         {
-            if(settings != null)
-            {
-                foldout = EditorGUILayout.InspectorTitlebar(foldout, settings);
+            foldout = EditorGUILayout.InspectorTitlebar(foldout, settings);
 
-                if(foldout)
-                {
-                    CreateCachedEditor(settings, null, ref editor);
-                    editor.OnInspectorGUI();
-                }
-            }
-            if(check.changed)
+            if(foldout)
             {
-                //Update Editor Planet
+                CreateCachedEditor(settings, null, ref editor);
+                editor.OnInspectorGUI();
             }
         }
     }
