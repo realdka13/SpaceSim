@@ -188,7 +188,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -346,7 +346,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421650691}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15335}
+  m_LocalPosition: {x: 0, y: 0, z: -8000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -383,23 +383,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29e818a786b00d34dadbbc72ce4e3740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshFilters: []
+  meshFilters:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   player: {fileID: 0}
-  distanceToPlayer: 0
-  radius: 1000
-  updateFrequency: 1
+  distancePlayerFromCenter: 0
+  planetSettingsFoldout: 0
+  planetSettings: {fileID: 11400000, guid: 928c45e6749ef4843a52e333748647cd, type: 2}
+  lodSettingsFoldout: 0
+  lodSettings: {fileID: 11400000, guid: df69a5156560f2348b5caa9b4f2b3783, type: 2}
+  radius: 0
   LOD0Resolution: 9
   cullingMinAngle: 90
-  detailLevelDistances:
-  - Infinity
-  - 6000
-  - 2500
-  - 1000
-  - 400
-  - 150
-  - 70
-  - 30
-  - 10
+  detailLevelDistances: []
 --- !u!4 &1588353634
 Transform:
   m_ObjectHideFlags: 0

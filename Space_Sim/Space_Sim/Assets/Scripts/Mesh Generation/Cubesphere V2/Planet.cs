@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //TODO Show Mesh in the Editor
-//TODO Make LOD update more efficient? Like if player hasnt moved, dont bother checking every chunk
-//TODO reduce culling angle as player gets closer to the planet
-//TODO Save this data to a scriptable object
-    //TODO Need to make sure there arnt too many meshes on the planet on properties reset
-
 
 public class Planet : MonoBehaviour
 {
@@ -19,78 +14,80 @@ public class Planet : MonoBehaviour
     //Player Info
     [HideInInspector]
     public Transform player;
-    //[HideInInspector]
-    public float distancePlayerFromCenter;              //Used for culling math
+    [HideInInspector]
+    public float distancePlayerFromCenter;      //Used for culling math
+    private Vector3 previousPlayerPosition;     //Used to decide if the player has moved, if not, dont bother redrawing mesh
+    private static float playerMoveTolerance = .5f;//Used to change the distance the player has to move before the mesh updates
 
-    [Header("Planet parameters")]
-    public float radius = 1000;                 //Size of the planet
+    //Settings
+    [HideInInspector]
+    public bool planetSettingsFoldout;
+    public PlanetSettings planetSettings;
+
+    [HideInInspector]
+    public bool lodSettingsFoldout;
+    public LODSettings lodSettings;
+
+    //Planet Parameters
+    [HideInInspector]
+    public float radius;                        //Size of the planet
 
     //LODs
-    [Space, Header("LOD Parameters")]
-    public float updateFrequency = .1f;         //Update frequency of LOD chunks
+    private float updateFrequency = .1f;         //Update frequency of LOD chunks
+    [HideInInspector]
     public int LOD0Resolution = 9;              //Resolution of LOD0, reccomended odd, 11 is the max for up to LOD8
-    public float cullingMinAngle = 90f; //Angle in Degrees from player to vertex to cull
+    [HideInInspector]
+    public float cullingMinAngle = 90f;         //Angle in Degrees from player to vertex to cull
 
     //LOD Levels
-    [Space]
-    public float[] detailLevelDistances = new float[] { //1 Square is subdivided into 4 at every LOD level
-        Mathf.Infinity, //LOD0
-        6000f,          //LOD1
-        2500f,          //LOD2
-        1000f,          //LOD3
-        400f,           //LOD4
-        150f,           //LOD5
-        70f,            //LOD6
-        30f,            //LOD7
-        10f             //LOD8
-    };
-
-    public float[,] cullingAngles = {
-    {Mathf.Infinity, 90f},
-    {6000f, 80f}, 
-    {2000f, 60f},
-    {1500f, 45f},
-    {1000, 30f},
-    {500, 20f},
-    {100f, 10f},
-    };
+    [Space,HideInInspector]
+    public float[] detailLevelDistances;
+    public float[,] cullingAngle;               //This currently cannot be edited per planet, and only in LODSettings.cs
     
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
+    private void Awake() 
+    {
+        //Initialize Settings
+        radius = planetSettings.radius;
+        detailLevelDistances = lodSettings.detailLevelDistances;
+        cullingAngle = lodSettings.cullingAngle;
+    }
 
     private void Start()
     {
+        //Find Player
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
+        //Create Mesh
         Initialize();
         GenerateMesh();
 
+        //Start Checking for mesh updates
         StartCoroutine(PlanetGenerationLoop());
-    }
-
-    private void Update()
-    {
-
     }
 
     private IEnumerator PlanetGenerationLoop()
     {
-        GenerateMesh();
-
         while(true)
         {
             yield return new WaitForSeconds(updateFrequency);
 
-            distancePlayerFromCenter = Vector3.Distance(transform.position, player.position);
-            float distancePlayerFromSurface = distancePlayerFromCenter - radius;
-            for(int i = cullingAngles.GetLength(0) - 1; i >= 0; i--)
+            //Check if player has even moved, if not, dont bother updating the mesh
+            if (Vector3.Distance(previousPlayerPosition, player.position) >= playerMoveTolerance)
             {
-                if(distancePlayerFromSurface < cullingAngles[i,0])
+                distancePlayerFromCenter = Vector3.Distance(transform.position, player.position);
+                float distancePlayerFromSurface = distancePlayerFromCenter - radius;
+                for(int i = cullingAngle.GetLength(0) - 1; i >= 0; i--)
                 {
-                    cullingMinAngle = cullingAngles[i,1];
-                    break;
+                    if(distancePlayerFromSurface < cullingAngle[i,0])
+                    {
+                        cullingMinAngle = cullingAngle[i,1];
+                        break;
+                    }
                 }
+                UpdateMesh();
+                previousPlayerPosition = player.position;
             }
-            UpdateMesh();
         }
     }
 
@@ -140,5 +137,14 @@ public class Planet : MonoBehaviour
         {
             branch.UpdateTree();
         }
+    }
+
+    public void GeneratePlanet()
+    {
+        radius = planetSettings.radius;
+        detailLevelDistances = lodSettings.detailLevelDistances;
+        cullingAngle = lodSettings.cullingAngle;
+        Initialize();
+        GenerateMesh();
     }
 }
