@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //TODO Show Mesh in the Editor
+//TODO The player movement check might cause problems with floating origin
 
 public class Planet : MonoBehaviour
 {
@@ -11,22 +12,23 @@ public class Planet : MonoBehaviour
     MeshFilter[] meshFilters;
     QuadTree[] tree;
 
+    //Settings
+    [HideInInspector]
+    public bool planetSettingsFoldout;
+    public PlanetSettings planetSettings;
+    [HideInInspector]
+    public bool lodSettingsFoldout;
+    public LODSettings lodSettings;
+
     //Player Info
     [HideInInspector]
     public Transform player;
     [HideInInspector]
     public float distancePlayerFromCenter;      //Used for culling math
     private Vector3 previousPlayerPosition;     //Used to decide if the player has moved, if not, dont bother redrawing mesh
-    private static float playerMoveTolerance = .5f;//Used to change the distance the player has to move before the mesh updates
-
-    //Settings
-    [HideInInspector]
-    public bool planetSettingsFoldout;
-    public PlanetSettings planetSettings;
-
-    [HideInInspector]
-    public bool lodSettingsFoldout;
-    public LODSettings lodSettings;
+    [Space]
+    public bool enableMoveTolerance = true;
+    private static float playerMoveTolerance = .5f;//Used to change the distance the player has to move before the mesh updates set to -1 to turn off
 
     //Planet Parameters
     [HideInInspector]
@@ -34,10 +36,12 @@ public class Planet : MonoBehaviour
 
     //LODs
     private float updateFrequency = .1f;         //Update frequency of LOD chunks
+    public bool enableLOD = true;
     [HideInInspector]
     public int LOD0Resolution = 9;              //Resolution of LOD0, reccomended odd, 11 is the max for up to LOD8
+    public bool enableCulling = true;
     [HideInInspector]
-    public float cullingMinAngle = 90f;         //Angle in Degrees from player to vertex to cull
+    public float currentCullingAngle = 90f;         //Angle in Degrees from player to vertex to cull
 
     //LOD Levels
     [Space,HideInInspector]
@@ -72,18 +76,25 @@ public class Planet : MonoBehaviour
         {
             yield return new WaitForSeconds(updateFrequency);
 
-            //Check if player has even moved, if not, dont bother updating the mesh
-            if (Vector3.Distance(previousPlayerPosition, player.position) >= playerMoveTolerance)
+            //Check if player has even moved, if not, dont bother updating the mesh, also make sure LOD is enabled
+            if ((Vector3.Distance(previousPlayerPosition, player.position) >= playerMoveTolerance || enableMoveTolerance == false) && enableLOD)
             {
                 distancePlayerFromCenter = Vector3.Distance(transform.position, player.position);
-                float distancePlayerFromSurface = distancePlayerFromCenter - radius;
-                for(int i = cullingAngle.GetLength(0) - 1; i >= 0; i--)
+                if(enableCulling)
                 {
-                    if(distancePlayerFromSurface < cullingAngle[i,0])
+                    float distancePlayerFromSurface = distancePlayerFromCenter - radius;
+                    for(int i = cullingAngle.GetLength(0) - 1; i >= 0; i--)
                     {
-                        cullingMinAngle = cullingAngle[i,1];
-                        break;
+                        if(distancePlayerFromSurface < cullingAngle[i,0])
+                        {
+                            currentCullingAngle = cullingAngle[i,1];
+                            break;
+                        }
                     }
+                }
+                else if(currentCullingAngle != 180f)                                                                   //If culling not enabled, set the culling angle to 180 degrees
+                {
+                    currentCullingAngle = 180f;
                 }
                 UpdateMesh();
                 previousPlayerPosition = player.position;

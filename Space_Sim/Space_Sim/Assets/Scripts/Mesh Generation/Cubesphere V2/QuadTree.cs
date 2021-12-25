@@ -48,16 +48,28 @@ public class QuadTree
 
         //Generate Chunks
         parentChunk = new Chunk(planetScript, null, null, localUp.normalized * planetScript.radius, radius, 0, localUp, axisA, axisB);  //Create parent chunk from Terrain face
-        parentChunk.GenerateChildren();
+        if(planetScript.enableLOD)
+        {
+            parentChunk.GenerateChildren();
+        }
 
         //Get chunk mesh data
-        int triangleIndex = 0;
-        foreach (Chunk child in parentChunk.GetVisableChildren())
+        if(parentChunk.children != null)
         {
-            (Vector3[], int[]) verticesAndTriangles = child.CalculateVerticesAndTriangles(triangleIndex);      //Asks for vertex info from only visable chunks
+            int triangleIndex = 0;
+            foreach (Chunk child in parentChunk.GetVisableChildren())
+            {
+                (Vector3[], int[]) verticesAndTriangles = child.CalculateVerticesAndTriangles(triangleIndex);      //Asks for vertex info from only visable chunks
+                vertices.AddRange(verticesAndTriangles.Item1);
+                triangles.AddRange(verticesAndTriangles.Item2);
+                triangleIndex += verticesAndTriangles.Item1.Length;
+            }
+        }
+        else
+        {
+            (Vector3[], int[]) verticesAndTriangles = parentChunk.CalculateVerticesAndTriangles(0);      //Asks for vertex info from only visable chunks
             vertices.AddRange(verticesAndTriangles.Item1);
             triangles.AddRange(verticesAndTriangles.Item2);
-            triangleIndex += verticesAndTriangles.Item1.Length;
         }
 
         //Reset Mesh and apply new data

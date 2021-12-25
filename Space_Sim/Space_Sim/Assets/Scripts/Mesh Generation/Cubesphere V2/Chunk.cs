@@ -127,7 +127,7 @@ public class Chunk
         else                                    //If chunk doesn't have children, decide if it should even be visable
         {
             float playerVertexAngle = Mathf.Acos((Mathf.Pow(planetScript.radius, 2) + Mathf.Pow(planetScript.distancePlayerFromCenter, 2) - Mathf.Pow(Vector3.Distance(planetScript.transform.TransformDirection(position.normalized * planetScript.radius), planetScript.player.position), 2)) / (2 * planetScript.radius * planetScript.distancePlayerFromCenter));
-            if (playerVertexAngle < planetScript.cullingMinAngle * Mathf.Deg2Rad)
+            if (playerVertexAngle < planetScript.currentCullingAngle * Mathf.Deg2Rad)
             {
                 toBeRendered.Add(this);
             }
