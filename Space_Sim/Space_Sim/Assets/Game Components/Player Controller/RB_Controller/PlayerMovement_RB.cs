@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 //TODO: Look direction not being taken into account when actively moving
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement_RB : MonoBehaviour
 {
     public float playerSpeed = 5f;
     public bool useAttractor = false;

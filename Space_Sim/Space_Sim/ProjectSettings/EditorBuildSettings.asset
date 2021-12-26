@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SolarSystem.unity
+    path: Assets/SolarSystem.unity
     guid: 6949a8570347f4f4d9e36a7449e9ca05
   m_configObjects: {}
