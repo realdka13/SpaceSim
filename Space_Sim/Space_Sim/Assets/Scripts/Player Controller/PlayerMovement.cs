@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//TODO: Make sure player can only move when grounded
+//TODO: Look direction not being taken into account when actively moving
+
 public class PlayerMovement : MonoBehaviour
 {
     public float playerSpeed = 5f;
+    public bool useAttractor = false;
+    private Rigidbody playerBody;
 
     //Grounding
     public float groundDistance = .25f;
@@ -16,8 +19,6 @@ public class PlayerMovement : MonoBehaviour
     //Moving
     private Vector2 moveVal;
     private Vector3 moveDirection;
-
-    private Rigidbody playerBody;
 
     //Gravity
     [Space]
@@ -30,6 +31,18 @@ public class PlayerMovement : MonoBehaviour
         playerBody = GetComponent<Rigidbody>();
         //attractorMass = attractorBody.GetComponent<BodyProperties>().mass;
         layerMask = ~LayerMask.GetMask("Player");
+    }
+
+    private void Start()
+    {
+        if(useAttractor)
+        {
+            playerBody.useGravity = false;
+        }
+        else
+        {
+            playerBody.useGravity = true;
+        }
     }
 
     private void Update()
@@ -47,9 +60,12 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Gravity
-        gravityForce = 9.8f;//(Universe.gravitationalConstant * attractorMass) / Vector3.Distance(attractorBody.transform.position, transform.position);
-        playerBody.AddForce((attractorBody.transform.position - transform.position).normalized * gravityForce);
-        playerBody.rotation = Quaternion.FromToRotation(transform.up, (transform.position - attractorBody.transform.position).normalized) * playerBody.rotation;
+        if(useAttractor)
+        {
+            gravityForce = 9.8f;//(Universe.gravitationalConstant * attractorMass) / Vector3.Distance(attractorBody.transform.position, transform.position);
+            playerBody.AddForce((attractorBody.transform.position - transform.position).normalized * gravityForce);
+            playerBody.rotation = Quaternion.FromToRotation(transform.up, (transform.position - attractorBody.transform.position).normalized) * playerBody.rotation;
+        }
     }
 
     void OnMovement(InputValue value)
