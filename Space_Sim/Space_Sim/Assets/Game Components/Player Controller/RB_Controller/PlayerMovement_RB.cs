@@ -52,19 +52,24 @@ public class PlayerMovement_RB : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (grounded)
-        {
+        //if (grounded)
+        //{
             //Move Player
             moveDirection = transform.forward * moveVal.y + transform.right * moveVal.x;
             playerBody.AddForce(moveDirection.normalized * (playerSpeed * 10f), ForceMode.Acceleration);
-        }
+       //}
 
         //Gravity
-        if(useAttractor)
+        if(useAttractor && attractorBody != null)
         {
             gravityForce = 9.8f;//(Universe.gravitationalConstant * attractorMass) / Vector3.Distance(attractorBody.transform.position, transform.position);
             playerBody.AddForce((attractorBody.transform.position - transform.position).normalized * gravityForce);
             playerBody.rotation = Quaternion.FromToRotation(transform.up, (transform.position - attractorBody.transform.position).normalized) * playerBody.rotation;
+        }
+        else if (attractorBody == null && useAttractor)
+        {
+            useAttractor = false;
+            playerBody.useGravity = true;
         }
     }
 
@@ -80,6 +85,9 @@ public class PlayerMovement_RB : MonoBehaviour
         Gizmos.DrawSphere(transform.position, groundDistance);
 
         //Gravity
-        Gizmos.DrawLine(transform.position, attractorBody.transform.position);
+        if(attractorBody != null)
+        {
+            Gizmos.DrawLine(transform.position, attractorBody.transform.position);
+        }
     }
 }

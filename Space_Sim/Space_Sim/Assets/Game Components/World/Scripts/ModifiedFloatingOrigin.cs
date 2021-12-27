@@ -17,7 +17,6 @@ public class ModifiedFloatingOrigin : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 playerPosition = gameObject.transform.position;
-        playerPosition.y = 0; // *** TEMP, find solution ***
 
         if (playerPosition.magnitude > distanceThreshold)
         {
@@ -25,7 +24,6 @@ public class ModifiedFloatingOrigin : MonoBehaviour
             {
                 objects.transform.position -= playerPosition;
             }
-            Debug.Log("Origin Reset");
         }
     }
 }
