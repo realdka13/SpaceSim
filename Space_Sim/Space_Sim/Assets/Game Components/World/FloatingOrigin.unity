@@ -1390,11 +1390,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 897424271823914827, guid: 01fea811db8b1f34a877e6c4f747710c, type: 3}
       propertyPath: playerSpeed
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 897424271823914827, guid: 01fea811db8b1f34a877e6c4f747710c, type: 3}
       propertyPath: useAttractor
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 897424271823914829, guid: 01fea811db8b1f34a877e6c4f747710c, type: 3}
       propertyPath: m_Name
