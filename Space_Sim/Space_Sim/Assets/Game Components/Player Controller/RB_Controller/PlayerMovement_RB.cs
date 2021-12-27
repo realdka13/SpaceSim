@@ -47,8 +47,7 @@ public class PlayerMovement_RB : MonoBehaviour
 
     private void Update()
     {
-        
-        grounded = Physics.CheckSphere(transform.position - transform.up ,groundDistance, layerMask);
+        grounded = Physics.CheckSphere(transform.position ,groundDistance, layerMask);
     }
 
     private void FixedUpdate()
@@ -56,6 +55,7 @@ public class PlayerMovement_RB : MonoBehaviour
         if (grounded)
         {
             //Move Player
+            moveDirection = transform.forward * moveVal.y + transform.right * moveVal.x;
             playerBody.AddForce(moveDirection.normalized * (playerSpeed * 10f), ForceMode.Acceleration);
         }
 
@@ -71,13 +71,15 @@ public class PlayerMovement_RB : MonoBehaviour
     void OnMovement(InputValue value)
     {
         moveVal = value.Get<Vector2>();
-        moveDirection = transform.forward * moveVal.y + transform.right * moveVal.x;
     }
 
-/*     void OnDrawGizmos()
+    void OnDrawGizmos()
     {
-        // Draw a black sphere at the transform's position
+        //Draw a black sphere at the transform's position
         Gizmos.color = Color.black;
-        Gizmos.DrawSphere(transform.position - transform.up, groundDistance);
-    } */
+        Gizmos.DrawSphere(transform.position, groundDistance);
+
+        //Gravity
+        Gizmos.DrawLine(transform.position, attractorBody.transform.position);
+    }
 }

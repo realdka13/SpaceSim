@@ -20,16 +20,15 @@ public class MouseLook : MonoBehaviour
         cameraTransform = playerCamera.GetComponent<Transform>();
     }
 
-    void OnMouseLook(InputValue value)
+    private void Update()
     {
-        Vector2 moveVal = value.Get<Vector2>();
-        float mouseX = moveVal.x * (mouseSensitivity * 10f) * Time.deltaTime;
-        float mouseY = moveVal.y * (mouseSensitivity * 10f) * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 10f * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 10f *Time.deltaTime;
 
         //Get proper rotation value
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
-        playerTransform.Rotate(Vector3.up * mouseX);
         cameraTransform.localRotation = Quaternion.Euler(xRot, 0f, 0f);
+        playerTransform.Rotate(Vector3.up * mouseX);
     }
 }
