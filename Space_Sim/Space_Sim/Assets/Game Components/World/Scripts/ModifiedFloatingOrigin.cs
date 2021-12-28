@@ -5,13 +5,16 @@ using UnityEngine.SceneManagement;
 
 public class ModifiedFloatingOrigin : MonoBehaviour
 {
+    //Universe
+    private UniverseManager universeManager;
+
     public float distanceThreshold = 100f;
     private Scene currentScene;
 
-
-    private void Start()
+    private void Awake()
     {
         currentScene = SceneManager.GetActiveScene();
+        universeManager = GameObject.FindGameObjectWithTag("Universe Manager").GetComponent<UniverseManager>();
     }
 
     private void FixedUpdate()
@@ -22,8 +25,12 @@ public class ModifiedFloatingOrigin : MonoBehaviour
         {
             foreach (GameObject objects in currentScene.GetRootGameObjects())
             {
-                objects.transform.position -= playerPosition;
+                if(objects.layer != 7 && objects.layer != 8)   //7 is the 3D skybox layer, 8 is the universe manager, it ignores it so it does not move
+                {
+                    objects.transform.position -= playerPosition;
+                }
             }
+            universeManager.UpdateOrigin(playerPosition);
         }
     }
 }

@@ -99,7 +99,7 @@ public class OnRailsObject : MonoBehaviour
     void CalculateSemiConstants()
     {
         //For Calculating mean anomaly
-        mu = Universe.gravitationalConstant * referenceBody.mass;                       //Standard Gravitational Paramter
+        mu = UniverseConstants.gravitationalConstant * referenceBody.mass;                       //Standard Gravitational Paramter
         n = Mathf.Sqrt(mu / Mathf.Pow(semiMajorAxis, 3));           //Mean Angular Motion n=sqrt(mu/a^3)
 
         //For Calculating true anomaly

@@ -11,12 +11,12 @@ public class BodyProperties : MonoBehaviour
 
     void Awake()
     {
-        mass = (radius * radius * surfaceGravity) / Universe.gravitationalConstant;
+        mass = (radius * radius * surfaceGravity) / UniverseConstants.gravitationalConstant;
     }
 
     void OnValidate ()
     {
-        mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
+        mass = surfaceGravity * radius * radius / UniverseConstants.gravitationalConstant;
         GetComponent<Transform>().localScale = new Vector3(radius * 2, radius * 2, radius * 2);
     }
 }

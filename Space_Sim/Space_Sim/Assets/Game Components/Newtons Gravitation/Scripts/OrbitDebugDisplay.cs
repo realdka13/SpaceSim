@@ -21,7 +21,7 @@ public class OrbitDebugDisplay : MonoBehaviour {
         public VirtualBody(CelestialBody body) {
             position = body.transform.position;
             velocity = body.initialVelocity;
-            mass = (body.radius * body.radius * body.surfaceGravity) / Universe.gravitationalConstant;
+            mass = (body.radius * body.radius * body.surfaceGravity) / UniverseConstants.gravitationalConstant;
         }
     }
 
@@ -105,7 +105,7 @@ public class OrbitDebugDisplay : MonoBehaviour {
             }
             Vector3 forceDir = (virtualBodies[j].position - virtualBodies[i].position).normalized;
             float sqrDst = (virtualBodies[j].position - virtualBodies[i].position).sqrMagnitude;
-            acceleration += forceDir * Universe.gravitationalConstant * virtualBodies[j].mass / sqrDst;
+            acceleration += forceDir * UniverseConstants.gravitationalConstant * virtualBodies[j].mass / sqrDst;
         }
         return acceleration;
     }
@@ -120,5 +120,5 @@ public class OrbitDebugDisplay : MonoBehaviour {
         }
     }
 
-    void OnValidate () {if(usePhysicsTimeStep){timeStep = Universe.physicsTimeStep;}}
+    void OnValidate () {if(usePhysicsTimeStep){timeStep = UniverseConstants.physicsTimeStep;}}
 }
