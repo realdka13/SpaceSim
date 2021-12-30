@@ -11,18 +11,29 @@ public class UniverseManager : MonoBehaviour
     private Transform playerTransform;
     private Vector3d playerUniverseCoords;
 
-    // Start is called before the first frame update
-    void Start()
+    //Railed Bodies
+    [SerializeField]
+    private Vector3d[] railedBodyCoords;
+
+//*****************************************************************************************************************************************************
+
+    void Awake()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        railedBodyCoords = new Vector3d[3]; //Improve this
     }
 
-    // Update is called once per frame
     void Update()
     {
         //Get player position
         playerUniverseCoords.Set((double)playerTransform.position.x + currentOrigin.x, (double)playerTransform.position.y + currentOrigin.y, (double)playerTransform.position.z + currentOrigin.z);
+        for (int i = 0; i < railedBodyCoords.Length; i++)
+        {
+            railedBodyCoords[i] = new Vector3d(249.21d, 234d, 23.134d);
+        }
     }
+
+
 
 
     //This function will update the current origin position to use in calculating the players universe coords
@@ -39,5 +50,15 @@ public class UniverseManager : MonoBehaviour
     public Quaternion GetPlayerRotation()
     {
         return playerTransform.rotation;
+    }
+
+    public int GetBodyCount()
+    {
+        return railedBodyCoords.Length;
+    }
+
+    public Vector3 GetBodyCoords(int bodyIndex)
+    {
+        return new Vector3((float)railedBodyCoords[bodyIndex].x, (float)railedBodyCoords[bodyIndex].y, (float)railedBodyCoords[bodyIndex].z);
     }
 }

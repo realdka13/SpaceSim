@@ -5,8 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - SkyboxCamera
-  - UI
-  - CinemachineTarget
+  - Universe Manager
   layers:
   - Default
   - TransparentFX
