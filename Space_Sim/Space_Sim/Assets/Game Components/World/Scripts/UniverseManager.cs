@@ -11,6 +11,15 @@ public class UniverseManager : MonoBehaviour
     private Transform playerTransform;
     private Vector3d playerUniverseCoords;
 
+    //For Teleporting
+    [Space,Header("Teleport To:")]
+    [SerializeField]
+    private double playerXCoord;
+    [SerializeField]
+    private double playerYCoord;
+    [SerializeField]
+    private double playerZCoord;
+
     //Railed Bodies
     [SerializeField]
     private Vector3d[] railedBodyCoords;
@@ -33,7 +42,12 @@ public class UniverseManager : MonoBehaviour
         }
     }
 
-
+    private void OnValidate()
+    {
+        //For Teleporting
+        currentOrigin.Set(playerXCoord,playerYCoord,playerZCoord);
+        Debug.Log("Player Moved");
+    }
 
 
     //This function will update the current origin position to use in calculating the players universe coords
