@@ -22,31 +22,37 @@ public class UniverseManager : MonoBehaviour
 
     //Railed Bodies
     [SerializeField]
-    private Vector3d[] railedBodyCoords;
+    private RailBody[] railBodies;
 
 //*****************************************************************************************************************************************************
 
     void Awake()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        railedBodyCoords = new Vector3d[3]; //Improve this
+        for (int i = 0; i < railBodies.Length; i++)
+        {
+            railBodies[i].CalculateSemiConstants(10000000000000d); // TODO Will be upgraded to a universal timer, TODO change mass
+        }
     }
 
     void Update()
     {
         //Get player position
         playerUniverseCoords.Set((double)playerTransform.position.x + currentOrigin.x, (double)playerTransform.position.y + currentOrigin.y, (double)playerTransform.position.z + currentOrigin.z);
-        for (int i = 0; i < railedBodyCoords.Length; i++)
+        for (int i = 0; i < railBodies.Length; i++)
         {
-            railedBodyCoords[i] = new Vector3d(249.21d, 234d, 23.134d);
+            railBodies[i].CalculateCoordinates(Time.time); // TODO Will be upgraded to a universal timer
         }
     }
 
-    private void OnValidate()
+    private void OnValidate()   // TODO Later move this to in game debug?
     {
         //For Teleporting
         currentOrigin.Set(playerXCoord,playerYCoord,playerZCoord);
-        Debug.Log("Player Moved");
+        for (int i = 0; i < railBodies.Length; i++)
+        {
+            railBodies[i].CalculateSemiConstants(10000000000000d); // TODO Will be upgraded to a universal timer, TODO change mass
+        }
     }
 
 
@@ -68,11 +74,12 @@ public class UniverseManager : MonoBehaviour
 
     public int GetBodyCount()
     {
-        return railedBodyCoords.Length;
+        return railBodies.Length;
     }
 
     public Vector3 GetBodyCoords(int bodyIndex)
     {
-        return new Vector3((float)railedBodyCoords[bodyIndex].x, (float)railedBodyCoords[bodyIndex].y, (float)railedBodyCoords[bodyIndex].z);
+        Vector3d railBodyCoords = railBodies[bodyIndex].GetCoordinates();
+        return new Vector3((float)railBodyCoords.x, (float)railBodyCoords.y, (float)railBodyCoords.z);
     }
 }

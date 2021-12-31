@@ -495,6 +495,8 @@ MonoBehaviour:
   playerXCoord: 0
   playerYCoord: 0
   playerZCoord: 0
+  railBodies:
+  - name: Planet1
 --- !u!1 &1707597825
 GameObject:
   m_ObjectHideFlags: 0

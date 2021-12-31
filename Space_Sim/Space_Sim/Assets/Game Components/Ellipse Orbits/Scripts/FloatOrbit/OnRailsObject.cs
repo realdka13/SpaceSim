@@ -32,7 +32,7 @@ public class OnRailsObject : MonoBehaviour
     //LineRenderer lineRender;
 
     //Numbers which only change if orbit or mass changes
-    [HideInInspector] [SerializeField] float mu, n, trueAnomalyConstant, cosLOAN, sinLOAN, sinI, cosI; //
+    [HideInInspector] [SerializeField] float mu, n, trueAnomalyConstant, cosLOAN, sinLOAN, sinI, cosI;
 
 
     void Awake()
