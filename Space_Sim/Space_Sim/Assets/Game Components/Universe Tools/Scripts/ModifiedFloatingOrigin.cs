@@ -25,7 +25,7 @@ public class ModifiedFloatingOrigin : MonoBehaviour
         {
             foreach (GameObject objects in currentScene.GetRootGameObjects())
             {
-                if(objects.layer != 7 && objects.layer != 8)   //7 is the 3D skybox layer, 8 is the universe manager, it ignores it so it does not move
+                if(objects.layer != 7 && objects.layer != 8 && objects.layer != 9)   //7 is the 3D skybox layer, 8 is the universe manager, 9 is lighting it ignores it so it does not move
                 {
                     objects.transform.position -= playerPosition;
                 }

@@ -10,15 +10,15 @@ public class DebugCam : MonoBehaviour
 
     //Movement
     private Vector2 moveVal;
-    private float xRot = 0f;    //Used for looking up and down
-    private float yRot = 0f;    //used for spinning
+    //private float xRot = 0f;    //Used for looking up and down
+    //private float yRot = 0f;    //used for spinning
     private float zRot = 0f;    //Used for tilting
     private Vector3 moveDirection;
 
     //Speeds
     public float horizantalSpeed = .1f;
     public float verticalSpeed = .1f;
-    public float xyRotationSpeed = .1f;
+    public float xyRotationSpeed = 1f;
     public float zRotationSpeed = 1f;
 
     private void Start()
@@ -30,23 +30,27 @@ public class DebugCam : MonoBehaviour
     private void Update()
     {
         //Rotation
-        float mouseX = Input.GetAxis("Mouse X") * xyRotationSpeed * 10f * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * xyRotationSpeed * 10f * Time.deltaTime;
+        float yRot = Input.GetAxis("Mouse X") * xyRotationSpeed * 10f * Time.deltaTime;
+        float xRot = Input.GetAxis("Mouse Y") * xyRotationSpeed * 10f * Time.deltaTime;
 
-        xRot -= mouseY;
-        xRot = Mathf.Clamp(xRot, -90f, 90f);
-        yRot += mouseX;
+        //xRot -= mouseY;
+        //xRot = Mathf.Clamp(xRot, -90f, 90f);
+       //yRot += mouseX;
 
         if(Input.GetKey("q"))
         {
-            zRot += zRotationSpeed;
+            zRot = Time.deltaTime * zRotationSpeed;
         }
         else if(Input.GetKey("e"))
         {
-            zRot -= zRotationSpeed;
+            zRot = -Time.deltaTime * zRotationSpeed;
+        }
+        else
+        {
+            zRot = 0f;
         }
 
-        cameraTransform.localRotation = Quaternion.Euler(xRot, yRot, zRot);
+        cameraTransform.Rotate(new Vector3(-xRot,yRot,zRot));
 
         //WASD Movement
         moveDirection = transform.forward * moveVal.y + transform.right * moveVal.x;
