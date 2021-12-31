@@ -23,10 +23,14 @@ public class UniverseManager : MonoBehaviour
     //Railed Bodies
     [Space,SerializeField]
     private RailBody[] railBodies;
+    [SerializeField]
+    private float renderDistance = 1000f;   // TODO sync with LOD 0/1 distance, since the basic mesh used by the skybox will be the LOD0 Version
 
-//*****************************************************************************************************************************************************
+//******************************************************************************************************************************
+//                                                     Private Functions
+//******************************************************************************************************************************
 
-    void Awake()
+    private void Awake()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         for (int i = 0; i < railBodies.Length; i++)
@@ -35,13 +39,23 @@ public class UniverseManager : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         //Get player position
         playerUniverseCoords.Set((double)playerTransform.position.x + currentOrigin.x, (double)playerTransform.position.y + currentOrigin.y, (double)playerTransform.position.z + currentOrigin.z);
         for (int i = 0; i < railBodies.Length; i++)
         {
             railBodies[i].CalculateCoordinates(Time.time); // TODO Will be upgraded to a universal timer
+
+            if(Vector3d.Distance(playerUniverseCoords, railBodies[i].GetCoordinates()) <= renderDistance)   //TODO remove distance calculation for speed
+            {
+                railBodies[i].EnableObject(true);
+                RenderPlanet(i);
+            }
+            else
+            {
+                railBodies[i].EnableObject(false);
+            }
         }
     }
 
@@ -55,6 +69,17 @@ public class UniverseManager : MonoBehaviour
         }
     }
 
+    private void RenderPlanet(int planetIndex)
+    {
+        Vector3d objectCoords = railBodies[planetIndex].GetCoordinates();
+        Vector3 localPosition = new Vector3((float)(objectCoords.x - currentOrigin.x), (float)(objectCoords.y - currentOrigin.y), (float)(objectCoords.z - currentOrigin.z));
+        railBodies[planetIndex].SetObjectLocalPosition(localPosition);
+    }
+
+
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
 
     //This function will update the current origin position to use in calculating the players universe coords
     public void UpdateOrigin(Vector3 originOffset)

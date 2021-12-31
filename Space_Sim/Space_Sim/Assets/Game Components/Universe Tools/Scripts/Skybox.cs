@@ -19,7 +19,9 @@ public class Skybox : MonoBehaviour
     [SerializeField]
     private GameObject[] railBodyMeshes;    // TODO Sync this with Universe Manager
 
-//**********************************************************************************************************************
+//******************************************************************************************************************************
+//                                                     Private Functions
+//******************************************************************************************************************************
 
     private void Awake()
     {
@@ -45,10 +47,27 @@ public class Skybox : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
         // Display the explosion radius when selected
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, 1100f);
+    }
+
+
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
+
+    public void EnableObject(bool enable, int bodyIndex)
+    {
+        if(enable)
+        {
+            railBodyMeshes[bodyIndex].SetActive(true);
+        }
+        else
+        {
+            railBodyMeshes[bodyIndex].SetActive(false);
+        }
     }
 }

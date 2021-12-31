@@ -10,6 +10,8 @@ public class RailBody
     private String name;
     private Vector3d coordinates;
     [SerializeField]
+    private GameObject bodyObject;
+    [SerializeField]
     private double referenceBodyMass;   // TODO connect this to Universe Manager
 
     const float TAU = Mathf.PI * 2;     //2pi, for the orbit sliders
@@ -31,7 +33,9 @@ public class RailBody
 
     [HideInInspector] [SerializeField] double mu, n, trueAnomalyConstant, cosLOAN, sinLOAN, sinI, cosI;
 
-//*********************************************************************************************************************
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
 
     //This must be called anytime theres an update to the Keplerian Parameters
     public void CalculateSemiConstants()
@@ -99,8 +103,26 @@ public class RailBody
         coordinates = new Vector3d(x, y, z) + Vector3d.zero;    // TODO the Vector3d.zero is the reference body location
     }
 
+
     public Vector3d GetCoordinates()
     {
         return coordinates;
+    }
+
+    public void EnableObject(bool enable)
+    {
+        if(enable)
+        {
+            bodyObject.SetActive(true);
+        }
+        else
+        {
+            bodyObject.SetActive(false);
+        }
+    }
+
+    public void SetObjectLocalPosition(Vector3 localPosition)
+    {
+        bodyObject.transform.localPosition = localPosition;
     }
 }

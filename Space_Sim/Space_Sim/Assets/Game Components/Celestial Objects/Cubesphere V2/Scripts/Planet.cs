@@ -50,7 +50,10 @@ public class Planet : MonoBehaviour
     public float[] detailLevelDistances;
     public float[,] cullingAngle;               //This currently cannot be edited per planet, and only in LODSettings.cs
     
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+//******************************************************************************************************************************
+//                                                     Private Functions
+//******************************************************************************************************************************
+
     private void Awake() 
     {
         //Initialize Settings
@@ -104,6 +107,9 @@ public class Planet : MonoBehaviour
         }
     }
 
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
 
     //This function just creates the necessary objects and assigns them, it does not actually calculate anything
     void Initialize()

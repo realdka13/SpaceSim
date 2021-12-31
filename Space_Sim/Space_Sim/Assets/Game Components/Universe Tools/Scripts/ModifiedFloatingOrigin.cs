@@ -8,7 +8,8 @@ public class ModifiedFloatingOrigin : MonoBehaviour
     //Universe
     private UniverseManager universeManager;
 
-    public float distanceThreshold = 100f;
+    [SerializeField]
+    private float distanceThreshold = 100f;
     private Scene currentScene;
 
     private void Awake()
