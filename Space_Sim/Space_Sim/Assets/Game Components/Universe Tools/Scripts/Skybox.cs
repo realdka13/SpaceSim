@@ -16,8 +16,7 @@ public class Skybox : MonoBehaviour
     private float skyboxScale = 1f; //This number indicates how much bigger the skybox appears than its actual size
 
     //Bodies
-    [SerializeField]
-    private GameObject[] railBodyMeshes;    // TODO Sync this with Universe Manager
+    private GameObject[] railBodyMeshes;
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -26,11 +25,21 @@ public class Skybox : MonoBehaviour
     private void Awake()
     {
         universeManager = GameObject.FindGameObjectWithTag("Universe Manager").GetComponent<UniverseManager>();
+        railBodyMeshes = new GameObject[universeManager.GetBodyCount()];
     }
 
     private void Start()
     {
-        //railedBodies = new GameObject[BodiesIndex];   // TODO this will be done automatically later, when prefabs of the planets exist
+        for(int i = 0; i < railBodyMeshes.Length; i++)
+        {
+            railBodyMeshes[i] = Instantiate(universeManager.GetBodyObjects(i), transform);
+            railBodyMeshes[i].layer = 7; //Skybox layer
+            foreach(Transform t in railBodyMeshes[i].transform)
+            {
+                t.gameObject.layer = 7;
+            }
+            railBodyMeshes[i].transform.localScale /= skyboxScale;
+        }
     }
 
     private void Update()

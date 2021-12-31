@@ -60,17 +60,17 @@ public class Planet : MonoBehaviour
         radius = planetSettings.radius;
         detailLevelDistances = lodSettings.detailLevelDistances;
         cullingAngle = lodSettings.cullingAngle;
-    }
 
-    private void Start()
-    {
         //Find Player
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
         //Create Mesh
         Initialize();
         GenerateMesh();
+    }
 
+    private void Start()
+    {
         //Start Checking for mesh updates
         StartCoroutine(PlanetGenerationLoop());
     }
@@ -112,7 +112,7 @@ public class Planet : MonoBehaviour
 //******************************************************************************************************************************
 
     //This function just creates the necessary objects and assigns them, it does not actually calculate anything
-    void Initialize()
+    public void Initialize()
     {
         if(meshFilters == null || meshFilters.Length == 0)                                                             //Only creates new mesh filters if none exist
         {

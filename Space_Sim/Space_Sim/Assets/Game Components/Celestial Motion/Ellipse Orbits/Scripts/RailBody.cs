@@ -121,6 +121,11 @@ public class RailBody
         }
     }
 
+    public GameObject GetBodyObject()
+    {
+        return bodyObject;
+    }
+
     public void SetObjectLocalPosition(Vector3 localPosition)
     {
         bodyObject.transform.localPosition = localPosition;

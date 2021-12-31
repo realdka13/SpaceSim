@@ -24,7 +24,10 @@ public class UniverseManager : MonoBehaviour
     [Space,SerializeField]
     private RailBody[] railBodies;
     [SerializeField]
-    private float renderDistance = 1000f;   // TODO sync with LOD 0/1 distance, since the basic mesh used by the skybox will be the LOD0 Version
+    private float renderDistance = 1000f;   // TODO sync with LOD 0/1 distance, since the basic mesh used by the skybox will be the LOD0 version
+
+    //Skybox
+    private Skybox skybox;
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -33,11 +36,13 @@ public class UniverseManager : MonoBehaviour
     private void Awake()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        skybox = GameObject.FindGameObjectWithTag("Skybox").GetComponent<Skybox>();
         for (int i = 0; i < railBodies.Length; i++)
         {
-            railBodies[i].CalculateSemiConstants(); // TODO change mass
+            railBodies[i].CalculateSemiConstants();
         }
     }
+
 
     private void Update()
     {
@@ -47,13 +52,15 @@ public class UniverseManager : MonoBehaviour
         {
             railBodies[i].CalculateCoordinates(Time.time); // TODO Will be upgraded to a universal timer
 
-            if(Vector3d.Distance(playerUniverseCoords, railBodies[i].GetCoordinates()) <= renderDistance)   //TODO remove distance calculation for speed
+            if(Vector3d.Distance(playerUniverseCoords, railBodies[i].GetCoordinates()) <= renderDistance)   //TODO remove distance calculation for optimization
             {
                 railBodies[i].EnableObject(true);
+                skybox.EnableObject(false, i);
                 RenderPlanet(i);
             }
             else
             {
+                skybox.EnableObject(true, i);
                 railBodies[i].EnableObject(false);
             }
         }
@@ -95,6 +102,11 @@ public class UniverseManager : MonoBehaviour
     public Quaternion GetPlayerRotation()
     {
         return playerTransform.rotation;
+    }
+
+    public GameObject GetBodyObjects(int bodyIndex)
+    {
+        return railBodies[bodyIndex].GetBodyObject();
     }
 
     public int GetBodyCount()
