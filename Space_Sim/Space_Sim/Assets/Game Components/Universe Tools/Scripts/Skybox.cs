@@ -38,7 +38,7 @@ public class Skybox : MonoBehaviour
             {
                 t.gameObject.layer = 7;
             }
-            railBodyMeshes[i].transform.localScale /= skyboxScale;
+            railBodyMeshes[i].transform.localScale = Vector3.one / skyboxScale;
         }
     }
 
