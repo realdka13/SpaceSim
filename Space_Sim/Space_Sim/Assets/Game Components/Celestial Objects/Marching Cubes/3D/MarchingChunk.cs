@@ -14,7 +14,7 @@ public class MarchingChunk
 	private MeshRenderer meshRenderer;
 
 	//Settings
-	private int radius;
+	private int diameter;
     private float terrainScaler;
 
 	private bool smoothTerrain;
@@ -28,16 +28,13 @@ public class MarchingChunk
 //******************************************************************************************************************************
 
 	//Constructor
-	public MarchingChunk(int radius, float terrainScaler, bool smoothTerrain, bool flatShaded)
+	public MarchingChunk(Transform parentTransform, int diameter, float terrainScaler, bool smoothTerrain, bool flatShaded)
 	{
-		this.radius = radius;
+		this.diameter = diameter;
 		this.terrainScaler = terrainScaler;
 		this.smoothTerrain = smoothTerrain;
 		this.flatShaded = flatShaded;
-	}
 
-    public void Initialize(Transform parentTransform)
-    {
 		chunkObj = new GameObject();
 		chunkObj.name = "chunk";
 		chunkObj.transform.parent = parentTransform;
@@ -46,11 +43,11 @@ public class MarchingChunk
 		meshRenderer = chunkObj.AddComponent<MeshRenderer>();
 
 		chunkObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard")); 
-        terrainMap = new float[radius + 1, radius + 1, radius + 1];
+        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];
 
         PopulateTerrainMap();
         CreateMeshData();
-    }
+	}
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -59,16 +56,16 @@ public class MarchingChunk
 	//Iterates through the map calculates the map data
     private void PopulateTerrainMap()
     {
-        for (int x = 0; x < radius + 1; x++)
+        for (int x = 0; x < diameter + 1; x++)
         {
-            for (int z = 0; z < radius + 1; z++)
+            for (int z = 0; z < diameter + 1; z++)
             {
-                for (int y = 0; y < radius + 1; y++)
+                for (int y = 0; y < diameter + 1; y++)
                 {
 					//Get the percentage through the large mesh
-					float xPer = (float)x / (float)radius;
-					float yPer = (float)y / (float)radius;
-					float zPer = (float)z / (float)radius;
+					float xPer = (float)x / (float)diameter;
+					float yPer = (float)y / (float)diameter;
+					float zPer = (float)z / (float)diameter;
 
 					//Remap them to center the sphere correctly TODO recenter whole mesh, make this uneeded?
 					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
@@ -91,11 +88,11 @@ public class MarchingChunk
 	//Keeps track of cube position and kicks off the rest
 	private void CreateMeshData()
     {
-        for (int x = 0; x < radius; x++)
+        for (int x = 0; x < diameter; x++)
         {
-            for (int y = 0; y < radius; y++)
+            for (int y = 0; y < diameter; y++)
             {
-                for (int z = 0; z < radius; z++)
+                for (int z = 0; z < diameter; z++)
                 {
                     MarchCube(new Vector3Int(x, y, z));
                 }
@@ -232,6 +229,6 @@ public class MarchingChunk
 
 	private Vector3 CenterVerts(Vector3 vertPosition)
 	{
-		return new Vector3(Remap(vertPosition.x,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f), Remap(vertPosition.y,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f), Remap(vertPosition.z,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f));
+		return new Vector3(Remap(vertPosition.x,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.y,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.z,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f));
 	}
 }

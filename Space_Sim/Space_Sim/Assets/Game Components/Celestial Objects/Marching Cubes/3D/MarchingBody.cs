@@ -6,11 +6,12 @@ using UnityEngine;
 //TODO LOD/Culling
 //TODO Upgrade Interpolation code
 //TODO shows in editor/Actively changes
+
 public class MarchingBody : MonoBehaviour
 {
 	//Settings
     [Header("Shape")]
-	public int radius;
+	public int diameter;
     [Range(0f,1f)]
     public float terrainScaler;
 
@@ -23,18 +24,13 @@ public class MarchingBody : MonoBehaviour
 
     private void Awake()
     {
-        chunk = new MarchingChunk(radius, terrainScaler, smoothTerrain, flatShaded);
-    }
-
-    void Start()
-    {
-        chunk.Initialize(transform);
+        chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded);
     }
 
     void OnDrawGizmosSelected()
     {
         // Draw a yellow cube at the transform position
         Gizmos.color = Color.black;
-        Gizmos.DrawWireCube(transform.position, new Vector3(radius, radius, radius));
+        Gizmos.DrawWireCube(transform.position, new Vector3(diameter, diameter, diameter));
     }
 }
