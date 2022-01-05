@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO LOD/Culling -> use chunks?
+//TODO Split up into different scripts as needed, rename scripts
+//TODO Upgrade Interpolation code
+//TODO shows in editor/Actively changes
+
 public class MarchingTest : MonoBehaviour
 {
 	//Verts and Tris Lists
@@ -12,12 +17,11 @@ public class MarchingTest : MonoBehaviour
     MeshFilter meshFilter;
 
 	//Settings
-    public float terrainSurface = .5f;
-    public int width = 32;
-    public int height = 8;
+	public int radius = 25;
+    public float terrainScaler = 1f;
+	[Space]
 	public bool smoothTerrain;
 	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
-							//TODO have flat shading without duplicating vertexes? This can be done in the inspector, play with later
 
 	//Terrain
     float[,,] terrainMap;
@@ -29,7 +33,7 @@ public class MarchingTest : MonoBehaviour
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
-        terrainMap = new float[width + 1, height + 1, width + 1];
+        terrainMap = new float[radius + 1, radius + 1, radius + 1];
 
         PopulateTerrainMap();
         CreateMeshData();
@@ -38,17 +42,16 @@ public class MarchingTest : MonoBehaviour
 	//Iterates through the map calculates the map data
     private void PopulateTerrainMap()
     {
-        for (int x = 0; x < width + 1; x++)
+        for (int x = 0; x < radius + 1; x++)
         {
-            for (int z = 0; z < width + 1; z++)
+            for (int z = 0; z < radius + 1; z++)
             {
-                for (int y = 0; y < height + 1; y++)
+                for (int y = 0; y < radius + 1; y++)
                 {
-					/*
 					//Get the percentage through the large mesh
-					float xPer = (float)x / (float)width;
-					float yPer = (float)y / (float)height;
-					float zPer = (float)z / (float)width;
+					float xPer = (float)x / (float)radius;
+					float yPer = (float)y / (float)radius;
+					float zPer = (float)z / (float)radius;
 
 					//Remap them to center the sphere correctly TODO recenter whole mesh, make this uneeded?
 					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
@@ -56,25 +59,10 @@ public class MarchingTest : MonoBehaviour
 					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
 
 					//Equation for a sphere
-					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;*/
-					terrainMap[x, y, z] = (float)y - ((float)height * Mathf.PerlinNoise((float)x / 16f * 1.5f + 0.001f, (float)z / 16f * 1.5f + 0.001f));
+					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
                 }
             }
         }
-    }
-
-	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
-    private int GetCubeConfiguration(float[] cube)
-    {
-        int configurationIndex = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            if(cube[i] > terrainSurface)	// TODO This needed?
-            {
-                configurationIndex |= 1 << i;
-            }
-        }
-        return configurationIndex;
     }
 
     private void ClearMeshData()
@@ -86,11 +74,11 @@ public class MarchingTest : MonoBehaviour
 	//Keeps track of cube position and kicks off the rest
 	private void CreateMeshData()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < radius; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < radius; y++)
             {
-                for (int z = 0; z < width; z++)
+                for (int z = 0; z < radius; z++)
                 {
                     MarchCube(new Vector3Int(x, y, z));
                 }
@@ -138,20 +126,20 @@ public class MarchingTest : MonoBehaviour
 
 					if(difference == 0)	//Check if terrain passes through midpoint
 					{
-						difference = terrainSurface;
+						difference = terrainScaler;
 					}
 					else
 					{
-						difference = (terrainSurface - vert1Value) / difference;
+						difference = (terrainScaler - vert1Value) / difference;
 					}
 
 					//Calculate point on edge where terrain passes
-					vertPosition = vert1 + ((vert2 - vert1) * difference);
+					vertPosition = CenterVerts(vert1 + ((vert2 - vert1) * difference));
 				}
 				else
 				{
 					// Get the midpoint of this edge. For non-smooth terrain just get edge midpoint
-                	vertPosition = (vert1 + vert2) / 2f;	
+                	vertPosition = CenterVerts((vert1 + vert2) / 2f);
 				}
 
 				// Add to our vertices and triangles list and incremement the edgeIndex.
@@ -167,6 +155,20 @@ public class MarchingTest : MonoBehaviour
                 edgeIndex ++;
             }
         }
+    }
+
+	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
+    private int GetCubeConfiguration(float[] cube)
+    {
+        int configurationIndex = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if(cube[i] > terrainScaler)	// TODO This needed?
+            {
+                configurationIndex |= 1 << i;
+            }
+        }
+        return configurationIndex;
     }
 
 	private int VertForIndex(Vector3 vert)
@@ -207,12 +209,16 @@ public class MarchingTest : MonoBehaviour
     	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 
+	private Vector3 CenterVerts(Vector3 vertPosition)
+	{
+		return new Vector3(Remap(vertPosition.x,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f), Remap(vertPosition.y,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f), Remap(vertPosition.z,0f,(float)radius,((float)radius / 2f) * -1f,(float)radius / 2f));
+	}
+
 	void OnDrawGizmosSelected()
     {
         // Draw a yellow cube at the transform position
         Gizmos.color = Color.black;
-		Vector3 adjustedPosition = new Vector3(transform.position.x + (.5f * width), transform.position.y + (.5f * height), transform.position.z + (.5f * width));
-        Gizmos.DrawWireCube(adjustedPosition, new Vector3(width, height, width));
+        Gizmos.DrawWireCube(transform.position, new Vector3(radius, radius, radius));
     }
 
 
