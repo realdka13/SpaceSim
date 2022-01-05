@@ -4,7 +4,220 @@ using UnityEngine;
 
 public class MarchingTest : MonoBehaviour
 {
-    //Lookup Tables
+	//Verts and Tris Lists
+    List<Vector3> vertices = new List<Vector3>();
+    List<int> triangles = new List<int>();
+
+	//Mesh
+    MeshFilter meshFilter;
+
+	//Settings
+    public float terrainSurface = .5f;
+    public int width = 32;
+    public int height = 8;
+	public bool smoothTerrain;
+	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
+							//TODO have flat shading without duplicating vertexes? This can be done in the inspector, play with later
+
+	//Terrain
+    float[,,] terrainMap;
+
+//******************************************************************************************************************************
+//                                                     Private Functions
+//******************************************************************************************************************************
+
+    private void Awake()
+    {
+        meshFilter = GetComponent<MeshFilter>();
+        terrainMap = new float[width + 1, height + 1, width + 1];
+
+        PopulateTerrainMap();
+        CreateMeshData();
+    }
+
+	//Iterates through the map calculates the map data
+    private void PopulateTerrainMap()
+    {
+        for (int x = 0; x < width + 1; x++)
+        {
+            for (int z = 0; z < width + 1; z++)
+            {
+                for (int y = 0; y < height + 1; y++)
+                {
+					/*
+					//Get the percentage through the large mesh
+					float xPer = (float)x / (float)width;
+					float yPer = (float)y / (float)height;
+					float zPer = (float)z / (float)width;
+
+					//Remap them to center the sphere correctly TODO recenter whole mesh, make this uneeded?
+					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
+					yPer = Remap(yPer, 0f, 1f, -1f, 1f);
+					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
+
+					//Equation for a sphere
+					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;*/
+					terrainMap[x, y, z] = (float)y - ((float)height * Mathf.PerlinNoise((float)x / 16f * 1.5f + 0.001f, (float)z / 16f * 1.5f + 0.001f));
+                }
+            }
+        }
+    }
+
+	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
+    private int GetCubeConfiguration(float[] cube)
+    {
+        int configurationIndex = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if(cube[i] > terrainSurface)	// TODO This needed?
+            {
+                configurationIndex |= 1 << i;
+            }
+        }
+        return configurationIndex;
+    }
+
+    private void ClearMeshData()
+    {
+        vertices.Clear();
+        triangles.Clear();
+    }
+
+	//Keeps track of cube position and kicks off the rest
+	private void CreateMeshData()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    MarchCube(new Vector3Int(x, y, z));
+                }
+            }
+        }
+        BuildMesh();
+    }
+
+	//Calculates the mesh data inside the current cube
+	private void MarchCube(Vector3Int position)
+    {
+		//Sample terrain values at each corner of terrain
+		float[] cube = new float[8];
+		for (int i = 0; i < 8; i++)
+		{
+			cube[i] = SampleTerrain(position + CornerTable[i]);
+		}
+		
+        int configIndex = GetCubeConfiguration(cube);
+
+        if(configIndex == 0 || configIndex == 255){return;}	//If all verts are on, or al verts are off, then just move on, since these wont display anything
+
+        int edgeIndex = 0;
+        for(int i = 0; i < 5; i++)  //Never more than 5 triangles per mesh
+        {
+            for (int j = 0; j < 3; j++) //3 points per triangle
+            {
+                int index = TriangleTable[configIndex, edgeIndex];
+
+                if(index == -1){return;} // If the current edgeIndex is -1, there are no more indices and we can exit the function
+
+				//Get the vertices for the start and end of this edge.
+                Vector3 vert1 = position + CornerTable[EdgeIndexes[index,0]];
+                Vector3 vert2 = position + CornerTable[EdgeIndexes[index,1]];
+
+				Vector3 vertPosition;
+				if(smoothTerrain)
+				{
+					//Get the terrain values of the edge vertices
+					float vert1Value = cube[EdgeIndexes[index,0]];
+					float vert2Value = cube[EdgeIndexes[index,1]];
+
+					//Calculate difference between terrain values
+					float difference = vert2Value - vert1Value;
+
+					if(difference == 0)	//Check if terrain passes through midpoint
+					{
+						difference = terrainSurface;
+					}
+					else
+					{
+						difference = (terrainSurface - vert1Value) / difference;
+					}
+
+					//Calculate point on edge where terrain passes
+					vertPosition = vert1 + ((vert2 - vert1) * difference);
+				}
+				else
+				{
+					// Get the midpoint of this edge. For non-smooth terrain just get edge midpoint
+                	vertPosition = (vert1 + vert2) / 2f;	
+				}
+
+				// Add to our vertices and triangles list and incremement the edgeIndex.
+				if(flatShaded)
+				{
+                	vertices.Add(vertPosition);
+                	triangles.Add(vertices.Count - 1);
+				}
+				else
+				{
+					triangles.Add(VertForIndex(vertPosition));
+				}
+                edgeIndex ++;
+            }
+        }
+    }
+
+	private int VertForIndex(Vector3 vert)
+	{
+		//Loop through all vertices in the vert list
+		for (int i = 0; i < vertices.Count; i++)
+		{
+			if(vertices[i] == vert)	//If a vert in the vertex array matches vert, then return the index
+			{
+				return i;
+			}
+		}
+
+		//Else if no existing vertex is found, add it to the array and return its index
+		vertices.Add(vert);
+		return vertices.Count - 1;
+	}
+
+	//Constructs the visable mesh
+    private void BuildMesh()
+    {
+        Mesh mesh = new Mesh();
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.RecalculateNormals();
+
+        meshFilter.mesh = mesh;
+    }
+
+	private float SampleTerrain(Vector3Int point)
+	{
+		return terrainMap[point.x, point.y, point.z];
+	}
+
+	private float Remap(float value, float from1, float to1, float from2, float to2)
+	{
+    	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+	}
+
+	void OnDrawGizmosSelected()
+    {
+        // Draw a yellow cube at the transform position
+        Gizmos.color = Color.black;
+		Vector3 adjustedPosition = new Vector3(transform.position.x + (.5f * width), transform.position.y + (.5f * height), transform.position.z + (.5f * width));
+        Gizmos.DrawWireCube(adjustedPosition, new Vector3(width, height, width));
+    }
+
+
+
+	 //Lookup Tables
     Vector3Int[] CornerTable = new Vector3Int[8] {
         new Vector3Int(0, 0, 0),
         new Vector3Int(1, 0, 0),
@@ -14,19 +227,19 @@ public class MarchingTest : MonoBehaviour
         new Vector3Int(1, 0, 1),
         new Vector3Int(1, 1, 1),
         new Vector3Int(0, 1, 1)};
-    Vector3[,] EdgeTable = new Vector3[12, 2] {
-        { new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f) },
-        { new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 0.0f) },
-        { new Vector3(0.0f, 1.0f, 0.0f), new Vector3(1.0f, 1.0f, 0.0f) },
-        { new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f) },
-        { new Vector3(0.0f, 0.0f, 1.0f), new Vector3(1.0f, 0.0f, 1.0f) },
-        { new Vector3(1.0f, 0.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f) },
-        { new Vector3(0.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f) },
-        { new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 1.0f, 1.0f) },
-        { new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, 1.0f) },
-        { new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 1.0f) },
-        { new Vector3(1.0f, 1.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f) },
-        { new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 1.0f) }};
+	int[,] EdgeIndexes = new int[12, 2] {
+		{0, 1},
+		{1, 2},
+		{3, 2},
+		{0, 3},
+		{4, 5},
+		{5, 6},
+		{7, 6},
+		{4, 7},
+		{0, 4},
+		{1, 5},
+		{2, 6},
+		{3, 7}};
     private int[,] TriangleTable = new int[,] {
 	    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	    {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -284,178 +497,5 @@ public class MarchingTest : MonoBehaviour
 	    {0, 9, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	    {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
-
-    
-	//
-	//Verts and Tris Lists
-    List<Vector3> vertices = new List<Vector3>();
-    List<int> triangles = new List<int>();
-
-    MeshFilter meshFilter;
-
-	//Settings
-    public float terrainSurface = .5f;
-    public int width = 32;
-    public int height = 8;
-    float[,,] terrainMap;
-
-    private void Awake()
-    {
-        meshFilter = GetComponent<MeshFilter>();
-        terrainMap = new float[width + 1, height + 1, width + 1];
-
-        PopulateTerrainMap();
-        CreateMeshData();
-    }
-
-
-
-
-	//Iterates through the map calculates the map data
-    private void PopulateTerrainMap()
-    {
-        for (int x = 0; x < width + 1; x++)
-        {
-            for (int z = 0; z < width + 1; z++)
-            {
-                for (int y = 0; y < height + 1; y++)
-                {
-                    float thisHeight = (float)height * Mathf.PerlinNoise((float)x / 16f * 1.5f + 0.001f, (float)z / 16f * 1.5f + 0.001f);
-                    float point = 0;
-                    if(y <= thisHeight - .5f)
-                    {
-                        point = 0f;
-                    }
-                    else if(y > thisHeight + .5f)
-                    {
-                        point = 1f;
-                    }
-                    else if(y > thisHeight)
-                    {
-                        point = (float)y - thisHeight;
-                    }
-                    else
-                    {
-                        point = thisHeight - (float)y;
-                    }
-					/*
-					//Get the percentage through the large mesh
-					float xPer = (float)x / (float)width;
-					float yPer = (float)y / (float)height;
-					float zPer = (float)z / (float)width;
-
-					//Remap them to center the sphere correctly TODO recenter whole mesh, make this uneeded?
-					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
-					yPer = Remap(yPer, 0f, 1f, -1f, 1f);
-					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
-
-					//Equation for a sphere
-					float point = xPer*xPer + yPer*yPer + zPer*zPer;
-					//float point = Mathf.Sin(xPer*yPer + xPer*zPer + yPer*zPer) + Mathf.Sin(xPer*yPer) + Mathf.Sin(yPer*zPer) + Mathf.Sin(xPer*zPer) - 1;
-					Debug.Log("x: " + xPer + " y: " + yPer + " z: " + zPer + " point: " + point); */
-					terrainMap[x, y, z] = point;
-                }
-            }
-        }
-    }
-
-	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
-    private int GetCubeConfiguration(float[] cube)
-    {
-        int configurationIndex = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            if(cube[i] > terrainSurface)	// TODO This needed?
-            {
-                configurationIndex |= 1 << i;
-            }
-        }
-        return configurationIndex;
-    }
-
-    private void ClearMeshData()
-    {
-        vertices.Clear();
-        triangles.Clear();
-    }
-
-	//Creates and sets the value of the individual cube vertices
-	private void CreateMeshData()
-    {
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < width; z++)
-                {
-					//Represents each corner of the cubes
-                    float[] cube = new float[8];
-                    for (int i = 0; i < 8; i++)
-                    {
-                        Vector3Int corner = new Vector3Int(x, y, z) + CornerTable[i];
-                        cube[i] = terrainMap[corner.x, corner.y, corner.z];
-                    }
-                    MarchCube(new Vector3(x, y, z), cube);
-                }
-            }
-        }
-        BuildMesh();
-    }
-
-	//Calculates the mesh data inside the current cube
-	private void MarchCube(Vector3 position, float[] cube)
-    {
-        int configIndex = GetCubeConfiguration(cube);
-
-        if(configIndex == 0 || configIndex == 255){return;}	//If all verts are on, or al verts are off, then just move on, since these wont display anything
-
-        int edgeIndex = 0;
-        for(int i = 0; i < 5; i++)  //Never more than 5 triangles per mesh
-        {
-            for (int j = 0; j < 3; j++) //3 points per triangle
-            {
-                int index = TriangleTable[configIndex, edgeIndex];
-
-                if(index == -1){return;} // If the current edgeIndex is -1, there are no more indices and we can exit the function
-
-				//Get the vertices for the start and end of this edge.
-                Vector3 vert1 = position + EdgeTable[index, 0];
-                Vector3 vert2 = position + EdgeTable[index, 1];
-
-				// Get the midpoint of this edge.
-                Vector3 vertPosition = (vert1 + vert2) / 2f;
-
-				// Add to our vertices and triangles list and incremement the edgeIndex.
-                vertices.Add(vertPosition);
-                triangles.Add(vertices.Count - 1);
-                edgeIndex ++;
-            }
-        }
-    }
-
-	//Constructs the visable mesh
-    private void BuildMesh()
-    {
-        Mesh mesh = new Mesh();
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-
-        meshFilter.mesh = mesh;
-    }
-
-	private float Remap(float value, float from1, float to1, float from2, float to2)
-	{
-    	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
-	}
-
-	void OnDrawGizmosSelected()
-    {
-        // Draw a yellow cube at the transform position
-        Gizmos.color = Color.black;
-		Vector3 adjustedPosition = new Vector3(transform.position.x + (.5f * width), transform.position.y + (.5f * height), transform.position.z + (.5f * width));
-        Gizmos.DrawWireCube(adjustedPosition, new Vector3(width, height, width));
-    }
 
 }

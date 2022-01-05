@@ -251,6 +251,7 @@ MonoBehaviour:
   terrainSurface: 0.5
   width: 25
   height: 10
+  smoothTerrain: 1
 --- !u!23 &657108985
 MeshRenderer:
   m_ObjectHideFlags: 0
