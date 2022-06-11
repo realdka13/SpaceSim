@@ -181,7 +181,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 755325091}
-  - component: {fileID: 755325090}
+  - component: {fileID: 755325092}
   m_Layer: 0
   m_Name: Planet2
   m_TagString: Untagged
@@ -189,32 +189,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &755325090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 755325089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29e818a786b00d34dadbbc72ce4e3740, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  meshFilters: []
-  planetSettingsFoldout: 0
-  planetSettings: {fileID: 11400000, guid: 928c45e6749ef4843a52e333748647cd, type: 2}
-  lodSettingsFoldout: 1
-  lodSettings: {fileID: 11400000, guid: df69a5156560f2348b5caa9b4f2b3783, type: 2}
-  player: {fileID: 0}
-  distancePlayerFromCenter: 0
-  enableMoveTolerance: 1
-  radius: 0
-  enableLOD: 0
-  LOD0Resolution: 9
-  enableCulling: 0
-  currentCullingAngle: 90
-  detailLevelDistances: []
 --- !u!4 &755325091
 Transform:
   m_ObjectHideFlags: 0
@@ -230,6 +204,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &755325092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755325089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac898dc669f1c740bc6ff047fb87677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 35
+  terrainScaler: 1
+  smoothTerrain: 1
+  flatShaded: 1
 --- !u!1 &774196283
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,7 +346,7 @@ MonoBehaviour:
   - name: Planet1
     bodyObject: {fileID: 1603272404}
     referenceBodyMass: 10000000000
-    semiMajorAxis: 2000
+    semiMajorAxis: 300
     eccentricity: 0
     inclination: 0
     longitudeOfAcendingNode: 0
@@ -365,7 +355,7 @@ MonoBehaviour:
     accuracyTolerance: 0.000001
     maxIterations: 5
     mu: 9999.999974752427
-    n: 0.0011180339873385126
+    n: 0.01924500894869304
     trueAnomalyConstant: 1
     cosLOAN: 1
     sinLOAN: 0
@@ -374,7 +364,7 @@ MonoBehaviour:
   - name: Planet2
     bodyObject: {fileID: 755325089}
     referenceBodyMass: 10000000000
-    semiMajorAxis: 3000
+    semiMajorAxis: 500
     eccentricity: 0.079
     inclination: 1.36
     longitudeOfAcendingNode: 0
@@ -383,13 +373,13 @@ MonoBehaviour:
     accuracyTolerance: 0.000001
     maxIterations: 5
     mu: 9999.999974752427
-    n: 0.0006085806186819254
+    n: 0.008944271898708101
     trueAnomalyConstant: 1.082382866052844
     cosLOAN: 1
     sinLOAN: 0
     sinI: 0.9778646054284992
     cosI: 0.209238651902954
-  renderDistance: 1000
+  renderDistance: 100
 --- !u!1 &1603272404
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,7 +389,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1603272406}
-  - component: {fileID: 1603272405}
+  - component: {fileID: 1603272407}
   m_Layer: 0
   m_Name: Planet1
   m_TagString: Untagged
@@ -407,32 +397,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1603272405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1603272404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29e818a786b00d34dadbbc72ce4e3740, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  meshFilters: []
-  planetSettingsFoldout: 0
-  planetSettings: {fileID: 11400000, guid: 928c45e6749ef4843a52e333748647cd, type: 2}
-  lodSettingsFoldout: 1
-  lodSettings: {fileID: 11400000, guid: df69a5156560f2348b5caa9b4f2b3783, type: 2}
-  player: {fileID: 0}
-  distancePlayerFromCenter: 0
-  enableMoveTolerance: 1
-  radius: 0
-  enableLOD: 0
-  LOD0Resolution: 9
-  enableCulling: 0
-  currentCullingAngle: 90
-  detailLevelDistances: []
 --- !u!4 &1603272406
 Transform:
   m_ObjectHideFlags: 0
@@ -448,6 +412,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1603272407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603272404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac898dc669f1c740bc6ff047fb87677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 35
+  terrainScaler: 1
+  smoothTerrain: 1
+  flatShaded: 1
 --- !u!1 &1707597825
 GameObject:
   m_ObjectHideFlags: 0

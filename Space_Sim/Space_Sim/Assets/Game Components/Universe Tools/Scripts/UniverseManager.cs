@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class UniverseManager : MonoBehaviour
 {
+    //**********
+    //trueOrigin is the "backend double origin",screenOrigin is the float origin in the editor
+    //playerTrueCoords is the "backend double origin", playerScreenCoords is the float coordinates in the editor
+    //**********
+
     //Origin
-    private Vector3d currentOrigin;
+    private Vector3d trueOrigin;
 
     //Player
-    private Transform playerTransform;
-    private Vector3d playerUniverseCoords;
+    private Transform playerTransform; //Also playerScreenCoords
+    private Vector3d playerTrueCoords;
 
-    //For Teleporting
+    //Origin Tracking
     [Space,Header("Teleport To:")]
     [SerializeField]
     private double playerXCoord;
@@ -25,6 +30,7 @@ public class UniverseManager : MonoBehaviour
     private RailBody[] railBodies;
     [SerializeField]
     private float renderDistance = 1000f;   // TODO sync with LOD 0/1 distance, since the basic mesh used by the skybox will be the LOD0 version
+                                            //Distance to switch between real(on screen) and fake(scaled space) bodies
 
     //Skybox
     private Skybox skybox;
@@ -35,8 +41,11 @@ public class UniverseManager : MonoBehaviour
 
     private void Awake()
     {
+        //Set default variables
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         skybox = GameObject.FindGameObjectWithTag("Skybox").GetComponent<Skybox>();
+
+        //Tell railbodies to calculate their constants to save processing later
         for (int i = 0; i < railBodies.Length; i++)
         {
             railBodies[i].CalculateSemiConstants();
@@ -46,20 +55,24 @@ public class UniverseManager : MonoBehaviour
 
     private void Update()
     {
-        //Get player position
-        playerUniverseCoords.Set((double)playerTransform.position.x + currentOrigin.x, (double)playerTransform.position.y + currentOrigin.y, (double)playerTransform.position.z + currentOrigin.z);
+        //Update playerTrueCoords every frame **This is not updating the origin**
+        playerTrueCoords.Set((double)playerTransform.position.x + trueOrigin.x, (double)playerTransform.position.y + trueOrigin.y, (double)playerTransform.position.z + trueOrigin.z);
+        
+        //Update railBodies positions
         for (int i = 0; i < railBodies.Length; i++)
         {
-            railBodies[i].CalculateCoordinates(Time.time); // TODO Will be upgraded to a universal timer
+            //Pass railBodies the current time
+            railBodies[i].CalculateCoordinates(Time.time); //TODO Will be upgraded to a universal timer
 
-            if(Vector3d.Distance(playerUniverseCoords, railBodies[i].GetCoordinates()) <= renderDistance)   //TODO remove distance calculation for optimization
-            {
+            //If player is within distance threshold to planet, turn on real body and remove fake body
+            if(Vector3d.Distance(playerTrueCoords, railBodies[i].GetCoordinates()) <= renderDistance)   //TODO remove distance calculation for optimization
+            {                                                                                           //TODO separate UpdateRealBodyPosition
                 railBodies[i].EnableObject(true);
                 skybox.EnableObject(false, i);
-                RenderPlanet(i);
+                UpdateRealBodyPosition(i);
             }
-            else
-            {
+            else//else, turn off real body and turn on fake body 
+            {   //TODO dont do this every frame, check if body is already hidden
                 skybox.EnableObject(true, i);
                 railBodies[i].EnableObject(false);
             }
@@ -69,17 +82,18 @@ public class UniverseManager : MonoBehaviour
     private void OnValidate()   // TODO Later move this to in game debug?
     {
         //For Teleporting
-        currentOrigin.Set(playerXCoord,playerYCoord,playerZCoord);
+        trueOrigin.Set(playerXCoord,playerYCoord,playerZCoord);
         for (int i = 0; i < railBodies.Length; i++)
         {
             railBodies[i].CalculateSemiConstants(); // TODO change mass
         }
     }
 
-    private void RenderPlanet(int planetIndex)
+    //
+    private void UpdateRealBodyPosition(int planetIndex)
     {
         Vector3d objectCoords = railBodies[planetIndex].GetCoordinates();
-        Vector3 localPosition = new Vector3((float)(objectCoords.x - currentOrigin.x), (float)(objectCoords.y - currentOrigin.y), (float)(objectCoords.z - currentOrigin.z));
+        Vector3 localPosition = new Vector3((float)(objectCoords.x - trueOrigin.x), (float)(objectCoords.y - trueOrigin.y), (float)(objectCoords.z - trueOrigin.z));
         railBodies[planetIndex].SetObjectLocalPosition(localPosition);
     }
 
@@ -88,15 +102,15 @@ public class UniverseManager : MonoBehaviour
 //                                                     Public Functions
 //******************************************************************************************************************************
 
-    //This function will update the current origin position to use in calculating the players universe coords
+    //This function will update the trueOrigin position to use in calculating the players universe coords
     public void UpdateOrigin(Vector3 originOffset)
     {
-        currentOrigin.Set(currentOrigin.x + (double)originOffset.x, currentOrigin.y + (double)originOffset.y, currentOrigin.z + (double)originOffset.z);
+        trueOrigin.Set(trueOrigin.x + (double)originOffset.x, trueOrigin.y + (double)originOffset.y, trueOrigin.z + (double)originOffset.z);
     }
 
     public Vector3 GetPlayerCoords()
     {
-        return new Vector3((float)playerUniverseCoords.x, (float)playerUniverseCoords.y, (float)playerUniverseCoords.z);
+        return new Vector3((float)playerTrueCoords.x, (float)playerTrueCoords.y, (float)playerTrueCoords.z);
     }
 
     public Quaternion GetPlayerRotation()

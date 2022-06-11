@@ -24,6 +24,7 @@ public class Skybox : MonoBehaviour
 
     private void Awake()
     {
+        //Set default variables
         universeManager = GameObject.FindGameObjectWithTag("Universe Manager").GetComponent<UniverseManager>();
         railBodyMeshes = new GameObject[universeManager.GetBodyCount()];
     }
@@ -32,12 +33,14 @@ public class Skybox : MonoBehaviour
     {
         for(int i = 0; i < railBodyMeshes.Length; i++)
         {
+            //Create scaled bodies
             railBodyMeshes[i] = Instantiate(universeManager.GetBodyObjects(i), transform);
-            railBodyMeshes[i].layer = 7; //Skybox layer
+            railBodyMeshes[i].layer = 7; //Set bodies to skybox layer (7) Skybox layer
             foreach(Transform t in railBodyMeshes[i].transform)
             {
                 t.gameObject.layer = 7;
             }
+            //Set positions of bodies
             railBodyMeshes[i].transform.localScale = Vector3.one / skyboxScale;
         }
     }
@@ -68,6 +71,7 @@ public class Skybox : MonoBehaviour
 //                                                     Public Functions
 //******************************************************************************************************************************
 
+    //Enable or disable the body
     public void EnableObject(bool enable, int bodyIndex)
     {
         if(enable)
