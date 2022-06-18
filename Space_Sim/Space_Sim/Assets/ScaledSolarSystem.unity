@@ -218,7 +218,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diameter: 35
   terrainScaler: 1
-  smoothTerrain: 1
+  smoothTerrain: 0
   flatShaded: 1
 --- !u!1 &774196283
 GameObject:
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diameter: 35
   terrainScaler: 1
-  smoothTerrain: 1
+  smoothTerrain: 0
   flatShaded: 1
 --- !u!1 &1707597825
 GameObject:

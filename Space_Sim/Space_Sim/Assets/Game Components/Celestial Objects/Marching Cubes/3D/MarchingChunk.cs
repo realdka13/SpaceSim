@@ -20,6 +20,9 @@ public class MarchingChunk
 	private bool smoothTerrain;
 	private bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
 
+	private float chunkSize;
+	private float[] chunkOffset;
+
 	//Terrain
     private float[,,] terrainMap;
 
@@ -28,13 +31,17 @@ public class MarchingChunk
 //******************************************************************************************************************************
 
 	//Constructor
-	public MarchingChunk(Transform parentTransform, int diameter, float terrainScaler, bool smoothTerrain, bool flatShaded)
+	public MarchingChunk(Transform parentTransform, int diameter, float terrainScaler, bool smoothTerrain, bool flatShaded, float chunkSize, float[] chunkOffset)
 	{
+		//Set object variables to passed in variables
 		this.diameter = diameter;
 		this.terrainScaler = terrainScaler;
 		this.smoothTerrain = smoothTerrain;
 		this.flatShaded = flatShaded;
+		this.chunkSize = chunkSize;
+		this.chunkOffset = chunkOffset;
 
+		//Create chunks
 		chunkObj = new GameObject();
 		chunkObj.name = "chunk";
 		chunkObj.transform.parent = parentTransform;
@@ -43,8 +50,9 @@ public class MarchingChunk
 		meshRenderer = chunkObj.AddComponent<MeshRenderer>();
 
 		chunkObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard")); 
-        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];
+        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];	//Create terrain map
 
+		//March Cubes
         PopulateTerrainMap();
         CreateMeshData();
 	}
@@ -73,16 +81,19 @@ public class MarchingChunk
 					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
 
 					//Equation for a sphere
-					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+					if(x >= chunkOffset[0] && x <= (chunkOffset[0] + chunkSize))	//Check if x is out of range first, if it is, the rest will be
+					{
+						if(z >= chunkOffset[2] && z <= (chunkOffset[2] + chunkSize))
+						{
+							if(y >= chunkOffset[1] && y <= (chunkOffset[1] + chunkSize))
+							{
+								terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+							}
+						}
+					}
                 }
             }
         }
-    }
-
-    private void ClearMeshData()
-    {
-        vertices.Clear();
-        triangles.Clear();
     }
 
 	//Keeps track of cube position and kicks off the rest
@@ -171,6 +182,18 @@ public class MarchingChunk
         }
     }
 
+	//Constructs the visable mesh
+    private void BuildMesh()
+    {
+        Mesh mesh = new Mesh();
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.RecalculateNormals();
+
+        meshFilter.mesh = mesh;
+    }
+
 	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
     private int GetCubeConfiguration(float[] cube)
     {
@@ -201,16 +224,10 @@ public class MarchingChunk
 		return vertices.Count - 1;
 	}
 
-	//Constructs the visable mesh
-    private void BuildMesh()
+	private void ClearMeshData()
     {
-        Mesh mesh = new Mesh();
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-
-        meshFilter.mesh = mesh;
+        vertices.Clear();
+        triangles.Clear();
     }
 
 //******************************************************************************************************************************

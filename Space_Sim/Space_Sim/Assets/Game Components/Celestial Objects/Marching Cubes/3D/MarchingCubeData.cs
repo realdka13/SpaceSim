@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class MarchingCubeData
 {
-    //Lookup Tables
+    //Lookup Tables for the marching cube algorithm
     public static Vector3Int[] CornerTable = new Vector3Int[8] {
         new Vector3Int(0, 0, 0),
         new Vector3Int(1, 0, 0),
