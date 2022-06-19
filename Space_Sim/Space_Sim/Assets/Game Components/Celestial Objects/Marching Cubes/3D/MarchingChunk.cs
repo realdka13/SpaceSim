@@ -75,11 +75,12 @@ public class MarchingChunk
 					float yPer = (float)y / (float)diameter;
 					float zPer = (float)z / (float)diameter;
 
-					//Remap them to center the sphere correctly TODO recenter whole mesh, make this uneeded?
+					//Remap them to center the sphere correctly
 					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
 					yPer = Remap(yPer, 0f, 1f, -1f, 1f);
 					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
 
+					
 					//Equation for a sphere
 					if(x >= chunkOffset[0] && x <= (chunkOffset[0] + chunkSize))	//Check if x is out of range first, if it is, the rest will be
 					{
@@ -91,6 +92,17 @@ public class MarchingChunk
 							}
 						}
 					}
+					
+					/*
+					if(x >= 1)
+					{
+					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+					}
+					else
+					{
+						terrainMap[x, y, z] = -1f;
+					}
+					*/
                 }
             }
         }
@@ -139,6 +151,8 @@ public class MarchingChunk
                 Vector3 vert1 = position + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,0]];
                 Vector3 vert2 = position + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,1]];
 
+
+				//Smooth Terrain
 				Vector3 vertPosition;
 				if(smoothTerrain)
 				{
@@ -163,11 +177,12 @@ public class MarchingChunk
 				}
 				else
 				{
-					// Get the midpoint of this edge. For non-smooth terrain just get edge midpoint
+					//Get the midpoint of this edge. For non-smooth terrain just get edge midpoint
                 	vertPosition = CenterVerts((vert1 + vert2) / 2f);
 				}
 
-				// Add to our vertices and triangles list and incremement the edgeIndex.
+				//Flat shading
+				//Add to our vertices and triangles list and incremement the edgeIndex.
 				if(flatShaded)
 				{
                 	vertices.Add(vertPosition);

@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 //TODO Remove Chunk Lines
+//TODO Fix not sphere not being created when chunks arnt whole numbers                                                                                                                                              
+//TODO Optimize
+//TODO Fix Verts when flat shading?
+
 //TODO LOD
 //TODO Culling
 //TODO Upgrade Interpolation code
 //TODO Shows in editor/Actively changes
 //TODO Remove terrainScaler/smooth terrain variables(needed)?
-//TODO Fix Verts when flat shading?
 
 public class MarchingBody : MonoBehaviour
 {
@@ -21,21 +24,26 @@ public class MarchingBody : MonoBehaviour
 
     [Header("Smoothness")]
 	public bool smoothTerrain;
-	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
+	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED***
 
     [Header("Chunks")]
-    [Range(0,5)]
+    [Range(0,5)][Tooltip("Chunk Subdivisions + 1 must be  multiple of diameter to render the full sphere")]
     public int chunkSubdivisions;
+    public float marchingDelay;
     private float chunkSize;
 
     //Chunk Objects
     private MarchingChunk[,,] chunks;
 
+    //TEMP
+    private MarchingChunk chunk;
+
 
 //******************************************************************************************************************************
 //                                                     Private Functions
 //******************************************************************************************************************************
-    private void Start()
+    IEnumerator Start() //*****Marching Cube debug cube*****
+    //private void Start()
     {
         //Calculate size of each chunck based of the selected number of subdivisions
         chunkSize = (diameter / (chunkSubdivisions + 1));
@@ -50,6 +58,7 @@ public class MarchingBody : MonoBehaviour
         //Set size of chunks array
         chunks = new MarchingChunk[chunkSubdivisions + 1, chunkSubdivisions + 1, chunkSubdivisions + 1];
 
+        
         //Create Chunks
         for (int x = 0; x < chunkSubdivisions + 1; x++)
         {
@@ -57,8 +66,16 @@ public class MarchingBody : MonoBehaviour
             {
                 for (int y = 0; y < chunkSubdivisions + 1; y++)
                 {
+                    //*****Marching Cube debug*****
+                    yield return new WaitForSeconds(marchingDelay);
+                    //*****Marching Cube debug*****
+
                     chunks[x, y, z] = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset); //The actual chunk creation call
 
+                    //*****Marching Cube debug*****
+                    yield return new WaitForSeconds(marchingDelay);
+                    //*****Marching Cube debug*****
+                    
                     //Chunk Y Offset
                     chunkOffset[1] = chunkOffset[1] + chunkSize;
                 }
@@ -71,6 +88,8 @@ public class MarchingBody : MonoBehaviour
              chunkOffset[2] = 0;
              chunkOffset[0] = chunkOffset[0] + chunkSize;
         }
+        
+        //chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset);
     }
 
 //******************************************************************************************************************************
