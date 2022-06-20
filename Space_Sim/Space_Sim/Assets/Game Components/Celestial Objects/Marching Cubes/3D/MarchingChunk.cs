@@ -41,15 +41,19 @@ public class MarchingChunk
 		this.chunkSize = chunkSize;
 		this.chunkOffset = chunkOffset;
 
-		//Create chunks
+		//Create chunk gameobject
 		chunkObj = new GameObject();
 		chunkObj.name = "chunk";
 		chunkObj.transform.parent = parentTransform;
 
+		//create chunk gameobject components
         meshFilter = chunkObj.AddComponent<MeshFilter>();
 		meshRenderer = chunkObj.AddComponent<MeshRenderer>();
 
+		//Set chunk color
 		chunkObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard")); 
+
+		//Create chunk terrain map
         terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];	//Create terrain map
 
 		//March Cubes
@@ -70,39 +74,28 @@ public class MarchingChunk
             {
                 for (int y = 0; y < diameter + 1; y++)
                 {
-					//Get the percentage through the large mesh
-					float xPer = (float)x / (float)diameter;
-					float yPer = (float)y / (float)diameter;
-					float zPer = (float)z / (float)diameter;
-
-					//Remap them to center the sphere correctly
-					xPer = Remap(xPer, 0f, 1f, -1f, 1f);
-					yPer = Remap(yPer, 0f, 1f, -1f, 1f);
-					zPer = Remap(zPer, 0f, 1f, -1f, 1f);
-
-					
-					//Equation for a sphere
+					//Check if in range TODO make this uneeded?? Each chunk should only render its own thing, not step through everything
 					if(x >= chunkOffset[0] && x <= (chunkOffset[0] + chunkSize))	//Check if x is out of range first, if it is, the rest will be
 					{
 						if(z >= chunkOffset[2] && z <= (chunkOffset[2] + chunkSize))
 						{
 							if(y >= chunkOffset[1] && y <= (chunkOffset[1] + chunkSize))
 							{
+								//Get the percentage through the large mesh
+								float xPer = (float)x / (float)diameter;
+								float yPer = (float)y / (float)diameter;
+								float zPer = (float)z / (float)diameter;
+
+								//Remap them to center the sphere correctly
+								xPer = Remap(xPer, 0f, 1f, -1f, 1f);
+								yPer = Remap(yPer, 0f, 1f, -1f, 1f);
+								zPer = Remap(zPer, 0f, 1f, -1f, 1f);
+
+								//Equation for a sphere
 								terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
 							}
 						}
 					}
-					
-					/*
-					if(x >= 1)
-					{
-					terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
-					}
-					else
-					{
-						terrainMap[x, y, z] = -1f;
-					}
-					*/
                 }
             }
         }

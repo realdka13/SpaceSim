@@ -3,15 +3,21 @@ using System.Collections;
 using UnityEngine;
 
 //TODO Remove Chunk Lines
+//TODO Doesnt build at body location
 //TODO Fix not sphere not being created when chunks arnt whole numbers                                                                                                                                              
 //TODO Optimize
 //TODO Fix Verts when flat shading?
 
-//TODO LOD
+//TODO LOD?
 //TODO Culling
 //TODO Upgrade Interpolation code
 //TODO Shows in editor/Actively changes
 //TODO Remove terrainScaler/smooth terrain variables(needed)?
+
+//TODO Modifiable Terrain
+//TODO Save terrain when loading/unloading
+
+//TODO Decorate!
 
 public class MarchingBody : MonoBehaviour
 {
@@ -42,8 +48,8 @@ public class MarchingBody : MonoBehaviour
 //******************************************************************************************************************************
 //                                                     Private Functions
 //******************************************************************************************************************************
-    IEnumerator Start() //*****Marching Cube debug cube*****
-    //private void Start()
+    //IEnumerator Start() //*****Marching Cube debug cube*****
+    private void Start()
     {
         //Calculate size of each chunck based of the selected number of subdivisions
         chunkSize = (diameter / (chunkSubdivisions + 1));
@@ -58,7 +64,7 @@ public class MarchingBody : MonoBehaviour
         //Set size of chunks array
         chunks = new MarchingChunk[chunkSubdivisions + 1, chunkSubdivisions + 1, chunkSubdivisions + 1];
 
-        
+        /*
         //Create Chunks
         for (int x = 0; x < chunkSubdivisions + 1; x++)
         {
@@ -88,8 +94,10 @@ public class MarchingBody : MonoBehaviour
              chunkOffset[2] = 0;
              chunkOffset[0] = chunkOffset[0] + chunkSize;
         }
+        */
         
-        //chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset);
+        Debug.Log("Transform: " + transform.position + ", " + transform.rotation + ", " + transform.localScale + "\nDiameter: " + diameter + "\nTerrain Scaler: " + terrainScaler + "\nSmooth Terrain: " + smoothTerrain + "\nFlat Shaded: " + flatShaded + "\nChunk Size: " + chunkSize + "\nChunk Offset: " + chunkOffset[0] + ", " + chunkOffset[1] + ", " + chunkOffset[2]);
+        chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset);
     }
 
 //******************************************************************************************************************************
