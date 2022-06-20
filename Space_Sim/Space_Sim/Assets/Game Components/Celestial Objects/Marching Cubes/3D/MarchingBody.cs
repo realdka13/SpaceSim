@@ -2,19 +2,16 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-//TODO Doesnt build at body location
-//TODO Fix not sphere not being created when chunks arnt whole numbers                                                                                                                                              
-//TODO Optimize
-//TODO Fix Verts when flat shading?
+//TODO Fix not sphere not being created when chunks arnt whole numbers
+//TODO Fix int casts
 
-//TODO LOD?
 //TODO Culling
-//TODO Upgrade Interpolation code
-//TODO Shows in editor/Actively changes
-//TODO Remove terrainScaler/smooth terrain variables(needed)?
+//TODO Shows (whole) in editor/Actively changes
 
+//Collision Mesh
 //TODO Modifiable Terrain
 //TODO Save terrain when loading/unloading
+//TODO LOD?
 
 //TODO Decorate!
 
@@ -22,9 +19,10 @@ public class MarchingBody : MonoBehaviour
 {
 	//Settings
     [Header("Shape")]
-    [Tooltip("Length of marching cube area. This is the diameter of the body if the terrain scaler is set to 1")]
-	public int diameter;
-    [Range(0f,1f)][Tooltip("Scale of terrain inside of marching cube area")]
+    [Tooltip("Length of marching cube area. This is the radius of the body if the terrain scaler is set to 1")]
+	public int radius;
+    private int diameter;
+    [Range(0f,.999f)][Tooltip("Scale of terrain inside of marching cube area")]
     public float terrainScaler;
 
     [Header("Smoothness")]
@@ -32,20 +30,16 @@ public class MarchingBody : MonoBehaviour
 	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED***
 
     [Header("Chunks")]
-    [Range(0,5)][Tooltip("Chunk Subdivisions + 1 must be  multiple of diameter to render the full sphere")]
+    [Range(0,5)][Tooltip("Chunk Subdivisions + 1 must be  multiple of DIAMETER to render the full sphere")]
     public int chunkSubdivisions;
-    public float marchingDelay;
-    private float[,,] terrainMap;
     private float chunkSize;
-    private int[] terrainStart;
-    private int[] terrainEnd;
-    
-
-    //Chunk Objects
+    public float marchingDelay;
     private MarchingChunk[,,] chunks;
 
-    //TEMP
-    private MarchingChunk chunk;
+    //Terrain
+    private float[,,] terrainMap;
+    private int[] terrainStart;
+    private int[] terrainEnd;
 
 
 //******************************************************************************************************************************
@@ -54,6 +48,9 @@ public class MarchingBody : MonoBehaviour
     //IEnumerator Start() //*****Marching Cube debug cube*****
     private void Awake()
     {
+        //Calclate Diameter
+        diameter = radius * 2;
+
         //Create terrain map for body
         terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];
         PopulateTerrainMap();
@@ -85,20 +82,20 @@ public class MarchingBody : MonoBehaviour
                     //yield return new WaitForSeconds(marchingDelay);
                     //*****Marching Cube debug*****
 
-                    chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, terrainMap, terrainStart, terrainEnd);
+                    chunks[x, y, z] = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, terrainMap, terrainStart, terrainEnd);
 
                     //*****Marching Cube debug*****
                     //yield return new WaitForSeconds(marchingDelay);
                     //*****Marching Cube debug*****
                     
                     //Chunk Y Offset
-                    terrainStart[1] = terrainStart[1] + (int)chunkSize; // TODO fix this int cast
+                    terrainStart[1] = terrainStart[1] + (int)chunkSize;
                     terrainEnd[1] = terrainStart[1] + (int)chunkSize;
                 }
                 //Chunk Z Offset
                 terrainStart[1] = 0;
                 terrainEnd[1] = terrainStart[1] + (int)chunkSize;
-                terrainStart[2] = terrainStart[2] + (int)chunkSize; // TODO fix this int cast
+                terrainStart[2] = terrainStart[2] + (int)chunkSize;
                 terrainEnd[2] = terrainStart[2] + (int)chunkSize;
             }
             //Chunk X Offset
@@ -106,7 +103,7 @@ public class MarchingBody : MonoBehaviour
             terrainEnd[1] = terrainStart[1] + (int)chunkSize;
             terrainStart[2] = 0;
             terrainEnd[2] = terrainStart[2] + (int)chunkSize;
-            terrainStart[0] = terrainStart[0] + (int)chunkSize; // TODO fix this int cast
+            terrainStart[0] = terrainStart[0] + (int)chunkSize;
             terrainEnd[0] = terrainStart[0] + (int)chunkSize;
         }
     }
@@ -150,7 +147,10 @@ public class MarchingBody : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         // Draw a Black cube at the transform position
-        Gizmos.color = Color.black;
-        Gizmos.DrawWireCube(transform.position, new Vector3(diameter, diameter, diameter));
+        Gizmos.matrix = this.transform.localToWorldMatrix;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(Vector3.zero, radius);
     }
 }

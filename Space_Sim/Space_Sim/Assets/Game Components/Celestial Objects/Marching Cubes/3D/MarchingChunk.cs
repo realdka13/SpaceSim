@@ -18,7 +18,7 @@ public class MarchingChunk
     private float terrainScaler;
 
 	private bool smoothTerrain;
-	private bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
+	private bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED***
 
 	//Terrain
     private float[,,] terrainMap;
@@ -43,8 +43,10 @@ public class MarchingChunk
 
 		//Create chunk gameobject
 		chunkObj = new GameObject();
+		chunkObj.transform.SetParent(parentTransform);
 		chunkObj.name = "chunk";
-		chunkObj.transform.parent = parentTransform;
+		chunkObj.transform.position = parentTransform.position;
+		chunkObj.transform.rotation = parentTransform.rotation;
 
 		//create chunk gameobject components
         meshFilter = chunkObj.AddComponent<MeshFilter>();
@@ -63,7 +65,7 @@ public class MarchingChunk
 	//Keeps track of cube position and kicks off the rest
 	private void CreateMeshData()
     {
-        for (int x = terrainStart[0]; x < terrainEnd[0]; x++) //TODO change diameter to whatever is passed in
+        for (int x = terrainStart[0]; x < terrainEnd[0]; x++)
         {
             for (int y = terrainStart[1]; y < terrainEnd[1]; y++)
             {
@@ -133,8 +135,9 @@ public class MarchingChunk
                 	vertPosition = CenterVerts((vert1 + vert2) / 2f);
 				}
 
+
 				//Flat shading
-				//Add to our vertices and triangles list and incremement the edgeIndex.
+				//Add to our vertices and triangles list and incriment the edgeIndex
 				if(flatShaded)
 				{
                 	vertices.Add(vertPosition);
@@ -167,7 +170,7 @@ public class MarchingChunk
         int configurationIndex = 0;
         for (int i = 0; i < 8; i++)
         {
-            if(cube[i] > terrainScaler)	// TODO This needed?
+            if(cube[i] > terrainScaler)
             {
                 configurationIndex |= 1 << i;
             }
@@ -211,7 +214,7 @@ public class MarchingChunk
     	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 
-	private Vector3 CenterVerts(Vector3 vertPosition) //TODO diameter needed here??
+	private Vector3 CenterVerts(Vector3 vertPosition)
 	{
 		return new Vector3(Remap(vertPosition.x,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.y,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.z,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f));
 	}

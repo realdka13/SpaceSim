@@ -261,12 +261,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dac898dc669f1c740bc6ff047fb87677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diameter: 10
-  terrainScaler: 1
-  smoothTerrain: 1
+  radius: 50
+  terrainScaler: 0.999
+  smoothTerrain: 0
   flatShaded: 1
-  chunkSubdivisions: 1
-  marchingDelay: 0
+  chunkSubdivisions: 4
+  marchingDelay: 0.5
 --- !u!1 &1259614704
 GameObject:
   m_ObjectHideFlags: 0
