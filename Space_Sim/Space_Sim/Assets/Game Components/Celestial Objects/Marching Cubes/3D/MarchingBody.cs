@@ -2,15 +2,13 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-//TODO Fix not sphere not being created when chunks arnt whole numbers
-//TODO Fix int casts
-
 //TODO Culling
-//TODO Shows (whole) in editor/Actively changes
+//TODO Shows (whole) body in editor/Actively changes
 
-//Collision Mesh
+//TODO Collision Mesh
 //TODO Modifiable Terrain
 //TODO Save terrain when loading/unloading
+
 //TODO LOD?
 
 //TODO Decorate!
@@ -21,7 +19,6 @@ public class MarchingBody : MonoBehaviour
     [Header("Shape")]
     [Tooltip("Length of marching cube area. This is the radius of the body if the terrain scaler is set to 1")]
 	public int radius;
-    private int diameter;
     [Range(0f,.999f)][Tooltip("Scale of terrain inside of marching cube area")]
     public float terrainScaler;
 
@@ -30,37 +27,70 @@ public class MarchingBody : MonoBehaviour
 	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED***
 
     [Header("Chunks")]
-    [Range(0,5)][Tooltip("Chunk Subdivisions + 1 must be  multiple of DIAMETER to render the full sphere")]
+    [Range(0,10)][Tooltip("Chunk Subdivisions + 1 must be a multiple of the DIAMETER to render the full sphere")]
     public int chunkSubdivisions;
-    private float chunkSize;
+    
     public float marchingDelay;
     private MarchingChunk[,,] chunks;
 
     //Terrain
     private float[,,] terrainMap;
-    private int[] terrainStart;
-    private int[] terrainEnd;
 
 
 //******************************************************************************************************************************
 //                                                     Private Functions
 //******************************************************************************************************************************
-    //IEnumerator Start() //*****Marching Cube debug cube*****
     private void Awake()
     {
-        //Calclate Diameter
-        diameter = radius * 2;
-
         //Create terrain map for body
-        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];
-        PopulateTerrainMap();
+        terrainMap = new float[(radius * 2) + 1, (radius * 2) + 1, (radius * 2) + 1]; //(radius * 2) is Diameter
+        PopulateTerrainMap(radius * 2);
 
+        //Create Chunks
+        //StartCoroutine(GenerateChunks()); //*****Marching Cube debug cube*****
+        GenerateChunks();
+
+        
+    }
+
+    private void PopulateTerrainMap(int diameter)
+    {
+        for (int x = 0; x < diameter + 1; x++)
+        {
+            for (int z = 0; z < diameter + 1; z++)
+            {
+                for (int y = 0; y < diameter + 1; y++)
+                {
+                    //Get the percentage through the large mesh
+                    float xPer = (float)x / (float)diameter;
+                    float yPer = (float)y / (float)diameter;
+                    float zPer = (float)z / (float)diameter;
+
+                    //Remap them to center the sphere correctly
+                    xPer = Remap(xPer, 0f, 1f, -1f, 1f);
+                    yPer = Remap(yPer, 0f, 1f, -1f, 1f);
+                    zPer = Remap(zPer, 0f, 1f, -1f, 1f);
+
+                    //Equation for a sphere
+                    terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+                }
+            }
+        }
+    }
+
+    //IEnumerator GenerateChunks() //*****Marching Cube debug cube*****
+    private void GenerateChunks()
+    {
         //Calculate size of each chunck based of the selected number of subdivisions
-        chunkSize = (diameter / (chunkSubdivisions + 1));
+        float chunkSize = ((float)(radius * 2) / ((float)chunkSubdivisions + 1f));
+        if(!Mathf.Approximately(chunkSize, Mathf.Round(chunkSize)))
+        {
+            Debug.LogWarning("Chunk Subdivisions + 1 must be a multiple of radius*2 (diameter) to render the full body correctly (chunkSize needs to be a whole number)\nChunk Size = " + chunkSize);
+        }
 
         //Telling the chunk where to look on the terrain map
-        terrainStart = new int[3];
-        terrainEnd = new int[3];
+        int[] terrainStart = new int[3];
+        int[] terrainEnd = new int[3];
         for (int i = 0; i < terrainStart.Length; i++)
         {
             terrainStart[i] = 0;
@@ -82,7 +112,7 @@ public class MarchingBody : MonoBehaviour
                     //yield return new WaitForSeconds(marchingDelay);
                     //*****Marching Cube debug*****
 
-                    chunks[x, y, z] = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, terrainMap, terrainStart, terrainEnd);
+                    chunks[x, y, z] = new MarchingChunk(transform, (radius * 2), terrainScaler, smoothTerrain, flatShaded, terrainMap, terrainStart, terrainEnd);
 
                     //*****Marching Cube debug*****
                     //yield return new WaitForSeconds(marchingDelay);
@@ -105,31 +135,6 @@ public class MarchingBody : MonoBehaviour
             terrainEnd[2] = terrainStart[2] + (int)chunkSize;
             terrainStart[0] = terrainStart[0] + (int)chunkSize;
             terrainEnd[0] = terrainStart[0] + (int)chunkSize;
-        }
-    }
-
-    private void PopulateTerrainMap()
-    {
-        for (int x = 0; x < diameter + 1; x++)
-        {
-            for (int z = 0; z < diameter + 1; z++)
-            {
-                for (int y = 0; y < diameter + 1; y++)
-                {
-                    //Get the percentage through the large mesh
-                    float xPer = (float)x / (float)diameter;
-                    float yPer = (float)y / (float)diameter;
-                    float zPer = (float)z / (float)diameter;
-
-                    //Remap them to center the sphere correctly
-                    xPer = Remap(xPer, 0f, 1f, -1f, 1f);
-                    yPer = Remap(yPer, 0f, 1f, -1f, 1f);
-                    zPer = Remap(zPer, 0f, 1f, -1f, 1f);
-
-                    //Equation for a sphere
-                    terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
-                }
-            }
         }
     }
 

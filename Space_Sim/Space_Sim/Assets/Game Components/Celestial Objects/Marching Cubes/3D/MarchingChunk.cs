@@ -14,7 +14,7 @@ public class MarchingChunk
 	private MeshRenderer meshRenderer;
 
 	//Settings
-	private int diameter;
+	private float diameter;
     private float terrainScaler;
 
 	private bool smoothTerrain;
