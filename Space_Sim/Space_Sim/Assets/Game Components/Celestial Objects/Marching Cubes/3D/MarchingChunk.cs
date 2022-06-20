@@ -20,26 +20,26 @@ public class MarchingChunk
 	private bool smoothTerrain;
 	private bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED
 
-	private float chunkSize;
-	private float[] chunkOffset;
-
 	//Terrain
     private float[,,] terrainMap;
+	private int[] terrainStart;
+	private int[] terrainEnd;
 
 //******************************************************************************************************************************
 //                                                     Public Functions
 //******************************************************************************************************************************
 
 	//Constructor
-	public MarchingChunk(Transform parentTransform, int diameter, float terrainScaler, bool smoothTerrain, bool flatShaded, float chunkSize, float[] chunkOffset)
+	public MarchingChunk(Transform parentTransform, int diameter, float terrainScaler, bool smoothTerrain, bool flatShaded, float[,,] terrainMap, int[] terrainStart, int[] terrainEnd)
 	{
 		//Set object variables to passed in variables
 		this.diameter = diameter;
 		this.terrainScaler = terrainScaler;
 		this.smoothTerrain = smoothTerrain;
 		this.flatShaded = flatShaded;
-		this.chunkSize = chunkSize;
-		this.chunkOffset = chunkOffset;
+		this.terrainMap = terrainMap;
+		this.terrainStart = terrainStart;
+		this.terrainEnd = terrainEnd;
 
 		//Create chunk gameobject
 		chunkObj = new GameObject();
@@ -53,11 +53,6 @@ public class MarchingChunk
 		//Set chunk color
 		chunkObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard")); 
 
-		//Create chunk terrain map
-        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];	//Create terrain map
-
-		//March Cubes
-        PopulateTerrainMap();
         CreateMeshData();
 	}
 
@@ -65,50 +60,14 @@ public class MarchingChunk
 //                                                     Private Functions
 //******************************************************************************************************************************
 
-	//Iterates through the map calculates the map data
-    private void PopulateTerrainMap()
-    {
-        for (int x = 0; x < diameter + 1; x++)
-        {
-            for (int z = 0; z < diameter + 1; z++)
-            {
-                for (int y = 0; y < diameter + 1; y++)
-                {
-					//Check if in range TODO make this uneeded?? Each chunk should only render its own thing, not step through everything
-					if(x >= chunkOffset[0] && x <= (chunkOffset[0] + chunkSize))	//Check if x is out of range first, if it is, the rest will be
-					{
-						if(z >= chunkOffset[2] && z <= (chunkOffset[2] + chunkSize))
-						{
-							if(y >= chunkOffset[1] && y <= (chunkOffset[1] + chunkSize))
-							{
-								//Get the percentage through the large mesh
-								float xPer = (float)x / (float)diameter;
-								float yPer = (float)y / (float)diameter;
-								float zPer = (float)z / (float)diameter;
-
-								//Remap them to center the sphere correctly
-								xPer = Remap(xPer, 0f, 1f, -1f, 1f);
-								yPer = Remap(yPer, 0f, 1f, -1f, 1f);
-								zPer = Remap(zPer, 0f, 1f, -1f, 1f);
-
-								//Equation for a sphere
-								terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
-							}
-						}
-					}
-                }
-            }
-        }
-    }
-
 	//Keeps track of cube position and kicks off the rest
 	private void CreateMeshData()
     {
-        for (int x = 0; x < diameter; x++)
+        for (int x = terrainStart[0]; x < terrainEnd[0]; x++) //TODO change diameter to whatever is passed in
         {
-            for (int y = 0; y < diameter; y++)
+            for (int y = terrainStart[1]; y < terrainEnd[1]; y++)
             {
-                for (int z = 0; z < diameter; z++)
+                for (int z = terrainStart[2]; z < terrainEnd[2]; z++)
                 {
                     MarchCube(new Vector3Int(x, y, z));
                 }
@@ -252,7 +211,7 @@ public class MarchingChunk
     	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 
-	private Vector3 CenterVerts(Vector3 vertPosition)
+	private Vector3 CenterVerts(Vector3 vertPosition) //TODO diameter needed here??
 	{
 		return new Vector3(Remap(vertPosition.x,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.y,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f), Remap(vertPosition.z,0f,(float)diameter,((float)diameter / 2f) * -1f,(float)diameter / 2f));
 	}

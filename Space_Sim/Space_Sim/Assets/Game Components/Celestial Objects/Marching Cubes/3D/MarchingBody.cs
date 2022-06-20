@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-//TODO Remove Chunk Lines
 //TODO Doesnt build at body location
 //TODO Fix not sphere not being created when chunks arnt whole numbers                                                                                                                                              
 //TODO Optimize
@@ -36,7 +35,11 @@ public class MarchingBody : MonoBehaviour
     [Range(0,5)][Tooltip("Chunk Subdivisions + 1 must be  multiple of diameter to render the full sphere")]
     public int chunkSubdivisions;
     public float marchingDelay;
+    private float[,,] terrainMap;
     private float chunkSize;
+    private int[] terrainStart;
+    private int[] terrainEnd;
+    
 
     //Chunk Objects
     private MarchingChunk[,,] chunks;
@@ -49,22 +52,28 @@ public class MarchingBody : MonoBehaviour
 //                                                     Private Functions
 //******************************************************************************************************************************
     //IEnumerator Start() //*****Marching Cube debug cube*****
-    private void Start()
+    private void Awake()
     {
+        //Create terrain map for body
+        terrainMap = new float[diameter + 1, diameter + 1, diameter + 1];
+        PopulateTerrainMap();
+
         //Calculate size of each chunck based of the selected number of subdivisions
         chunkSize = (diameter / (chunkSubdivisions + 1));
 
-        //Create Array to keep track of which chunk we are looking at
-        float[] chunkOffset = new float[3];
-        for (int i = 0; i < chunkOffset.Length; i++)
+        //Telling the chunk where to look on the terrain map
+        terrainStart = new int[3];
+        terrainEnd = new int[3];
+        for (int i = 0; i < terrainStart.Length; i++)
         {
-            chunkOffset[i] = 0f;
+            terrainStart[i] = 0;
+            terrainEnd[i] = terrainStart[i] + (int)chunkSize;
         }
 
         //Set size of chunks array
         chunks = new MarchingChunk[chunkSubdivisions + 1, chunkSubdivisions + 1, chunkSubdivisions + 1];
 
-        /*
+        
         //Create Chunks
         for (int x = 0; x < chunkSubdivisions + 1; x++)
         {
@@ -73,31 +82,66 @@ public class MarchingBody : MonoBehaviour
                 for (int y = 0; y < chunkSubdivisions + 1; y++)
                 {
                     //*****Marching Cube debug*****
-                    yield return new WaitForSeconds(marchingDelay);
+                    //yield return new WaitForSeconds(marchingDelay);
                     //*****Marching Cube debug*****
 
-                    chunks[x, y, z] = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset); //The actual chunk creation call
+                    chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, terrainMap, terrainStart, terrainEnd);
 
                     //*****Marching Cube debug*****
-                    yield return new WaitForSeconds(marchingDelay);
+                    //yield return new WaitForSeconds(marchingDelay);
                     //*****Marching Cube debug*****
                     
                     //Chunk Y Offset
-                    chunkOffset[1] = chunkOffset[1] + chunkSize;
+                    terrainStart[1] = terrainStart[1] + (int)chunkSize; // TODO fix this int cast
+                    terrainEnd[1] = terrainStart[1] + (int)chunkSize;
                 }
-                 //Chunk Z Offset
-                 chunkOffset[1] = 0;
-                 chunkOffset[2] = chunkOffset[2] + chunkSize;
+                //Chunk Z Offset
+                terrainStart[1] = 0;
+                terrainEnd[1] = terrainStart[1] + (int)chunkSize;
+                terrainStart[2] = terrainStart[2] + (int)chunkSize; // TODO fix this int cast
+                terrainEnd[2] = terrainStart[2] + (int)chunkSize;
             }
-             //Chunk X Offset
-             chunkOffset[1] = 0;
-             chunkOffset[2] = 0;
-             chunkOffset[0] = chunkOffset[0] + chunkSize;
+            //Chunk X Offset
+            terrainStart[1] = 0;
+            terrainEnd[1] = terrainStart[1] + (int)chunkSize;
+            terrainStart[2] = 0;
+            terrainEnd[2] = terrainStart[2] + (int)chunkSize;
+            terrainStart[0] = terrainStart[0] + (int)chunkSize; // TODO fix this int cast
+            terrainEnd[0] = terrainStart[0] + (int)chunkSize;
         }
-        */
-        
-        Debug.Log("Transform: " + transform.position + ", " + transform.rotation + ", " + transform.localScale + "\nDiameter: " + diameter + "\nTerrain Scaler: " + terrainScaler + "\nSmooth Terrain: " + smoothTerrain + "\nFlat Shaded: " + flatShaded + "\nChunk Size: " + chunkSize + "\nChunk Offset: " + chunkOffset[0] + ", " + chunkOffset[1] + ", " + chunkOffset[2]);
-        chunk = new MarchingChunk(transform, diameter, terrainScaler, smoothTerrain, flatShaded, chunkSize, chunkOffset);
+    }
+
+    private void PopulateTerrainMap()
+    {
+        for (int x = 0; x < diameter + 1; x++)
+        {
+            for (int z = 0; z < diameter + 1; z++)
+            {
+                for (int y = 0; y < diameter + 1; y++)
+                {
+                    //Get the percentage through the large mesh
+                    float xPer = (float)x / (float)diameter;
+                    float yPer = (float)y / (float)diameter;
+                    float zPer = (float)z / (float)diameter;
+
+                    //Remap them to center the sphere correctly
+                    xPer = Remap(xPer, 0f, 1f, -1f, 1f);
+                    yPer = Remap(yPer, 0f, 1f, -1f, 1f);
+                    zPer = Remap(zPer, 0f, 1f, -1f, 1f);
+
+                    //Equation for a sphere
+                    terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+                }
+            }
+        }
+    }
+
+//******************************************************************************************************************************
+//                                                     Helper Functions
+//******************************************************************************************************************************
+    private float Remap(float value, float from1, float to1, float from2, float to2)
+    {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
 
 //******************************************************************************************************************************
