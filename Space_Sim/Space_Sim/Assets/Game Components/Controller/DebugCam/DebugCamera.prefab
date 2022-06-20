@@ -131,4 +131,5 @@ MonoBehaviour:
   horizantalSpeed: 0.5
   verticalSpeed: 0.5
   xyRotationSpeed: 30
-  zRotationSpeed: 0.3
+  zRotationSpeed: 100
+  terraformDistance: 10

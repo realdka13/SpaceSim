@@ -10,8 +10,6 @@ public class DebugCam : MonoBehaviour
 
     //Movement
     private Vector2 moveVal;
-    //private float xRot = 0f;    //Used for looking up and down
-    //private float yRot = 0f;    //used for spinning
     private float zRot = 0f;    //Used for tilting
     private Vector3 moveDirection;
 
@@ -20,6 +18,9 @@ public class DebugCam : MonoBehaviour
     public float verticalSpeed = .1f;
     public float xyRotationSpeed = 1f;
     public float zRotationSpeed = 1f;
+
+    //Terrain
+    public float terraformDistance;
 
     private void Start()
     {
@@ -67,6 +68,21 @@ public class DebugCam : MonoBehaviour
         else if(Input.GetKey("left shift"))
         {
             cameraTransform.position = Vector3.Lerp(transform.position, transform.position - transform.up, verticalSpeed);
+        }
+
+        //Mouse Click (For terrain)
+        if(Input.GetMouseButtonDown(0))
+        {
+            Ray ray = gameObject.GetComponent<Camera>().ViewportPointToRay(new Vector3(.5f,.5f,0));
+            RaycastHit hit;
+
+            if(Physics.Raycast(ray, out hit, terraformDistance))
+            {
+                if(hit.transform.tag == "Terrain")
+                {
+                    hit.transform.parent.GetComponent<MarchingBody>().PlaceTerrain(hit.point);
+                }
+            }
         }
     }
 

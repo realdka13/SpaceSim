@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO have all planet control be possible on this script
+//TODO Better object management
+
 public class UniverseManager : MonoBehaviour
-{
+{    
     //**********
     //trueOrigin is the "backend double origin",screenOrigin is the float origin in the editor
     //playerTrueCoords is the "backend double origin", playerScreenCoords is the float coordinates in the editor

@@ -2,15 +2,17 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-//TODO Culling
-//TODO Shows (whole) body in editor/Actively changes
+//TODO LOD - Octree Marching cubes - Transvoxel
+//TODO Culling - Law of cosines thing
 
-//TODO Collision Mesh
-//TODO Modifiable Terrain
+//TODO Improve Collision Mesh
+//TODO Improve Modifiable Terrain - move to its own script?
+
 //TODO Save terrain when loading/unloading
 
-//TODO LOD?
+//TODO Move rendering to GPU
 
+//TODO Shows (whole) body in editor/Actively changes
 //TODO Decorate!
 
 public class MarchingBody : MonoBehaviour
@@ -27,7 +29,7 @@ public class MarchingBody : MonoBehaviour
 	public bool flatShaded;	//***WARNING, INCREASES VERTEX COUNT AS VERTICES GET DUPLICATED***
 
     [Header("Chunks")]
-    [Range(0,10)][Tooltip("Chunk Subdivisions + 1 must be a multiple of the DIAMETER to render the full sphere")]
+    [Range(0,9)][Tooltip("Chunk Subdivisions + 1 must be a multiple of the DIAMETER to render the full sphere")]
     public int chunkSubdivisions;
     
     public float marchingDelay;
@@ -36,6 +38,19 @@ public class MarchingBody : MonoBehaviour
     //Terrain
     private float[,,] terrainMap;
 
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
+public void PlaceTerrain(Vector3 pos)
+{
+    Vector3Int v3Int = new Vector3Int(Mathf.CeilToInt(pos.x), Mathf.CeilToInt(pos.y), Mathf.CeilToInt(pos.z));
+    //terrainMap[v3Int.x, v3Int.y, v3Int.z] = 0f;
+    foreach (MarchingChunk chunk in chunks)
+    {
+        //chunk.CreateMeshData();
+        Debug.Log("Regenerating Meshes");
+    }
+}
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -43,14 +58,12 @@ public class MarchingBody : MonoBehaviour
     private void Awake()
     {
         //Create terrain map for body
-        terrainMap = new float[(radius * 2) + 1, (radius * 2) + 1, (radius * 2) + 1]; //(radius * 2) is Diameter
+        terrainMap = new float[(radius * 2) + 1, (radius * 2) + 1, (radius * 2) + 1]; //(radius * 2) is diameter
         PopulateTerrainMap(radius * 2);
 
         //Create Chunks
         //StartCoroutine(GenerateChunks()); //*****Marching Cube debug cube*****
         GenerateChunks();
-
-        
     }
 
     private void PopulateTerrainMap(int diameter)

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Universe Manager
   - Skybox
+  - Terrain
   layers:
   - Default
   - TransparentFX

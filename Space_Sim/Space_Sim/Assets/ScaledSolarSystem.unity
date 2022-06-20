@@ -348,7 +348,7 @@ MonoBehaviour:
   - name: Planet1
     bodyObject: {fileID: 1603272404}
     referenceBodyMass: 10000000000
-    semiMajorAxis: 300
+    semiMajorAxis: 500
     eccentricity: 0
     inclination: 0
     longitudeOfAcendingNode: 0
@@ -357,7 +357,7 @@ MonoBehaviour:
     accuracyTolerance: 0.000001
     maxIterations: 5
     mu: 9999.999974752427
-    n: 0.01924500894869304
+    n: 0.008944271898708101
     trueAnomalyConstant: 1
     cosLOAN: 1
     sinLOAN: 0
@@ -366,7 +366,7 @@ MonoBehaviour:
   - name: Planet2
     bodyObject: {fileID: 755325089}
     referenceBodyMass: 10000000000
-    semiMajorAxis: 500
+    semiMajorAxis: 900
     eccentricity: 0.079
     inclination: 1.36
     longitudeOfAcendingNode: 0
@@ -375,7 +375,7 @@ MonoBehaviour:
     accuracyTolerance: 0.000001
     maxIterations: 5
     mu: 9999.999974752427
-    n: 0.008944271898708101
+    n: 0.0037037036990282273
     trueAnomalyConstant: 1.082382866052844
     cosLOAN: 1
     sinLOAN: 0

@@ -10,8 +10,11 @@ public class MarchingChunk
 
 	//Chunk
 	private GameObject chunkObj;
+
+	//Chunk Components
     private MeshFilter meshFilter;
 	private MeshRenderer meshRenderer;
+	private MeshCollider meshCollider;
 
 	//Settings
 	private float diameter;
@@ -45,12 +48,15 @@ public class MarchingChunk
 		chunkObj = new GameObject();
 		chunkObj.transform.SetParent(parentTransform);
 		chunkObj.name = "chunk";
+		chunkObj.transform.tag = "Terrain";
 		chunkObj.transform.position = parentTransform.position;
 		chunkObj.transform.rotation = parentTransform.rotation;
 
 		//create chunk gameobject components
         meshFilter = chunkObj.AddComponent<MeshFilter>();
 		meshRenderer = chunkObj.AddComponent<MeshRenderer>();
+		meshCollider = chunkObj.AddComponent<MeshCollider>();
+		//meshCollider.convex = true;
 
 		//Set chunk color
 		chunkObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard")); 
@@ -59,11 +65,10 @@ public class MarchingChunk
 	}
 
 //******************************************************************************************************************************
-//                                                     Private Functions
+//                                                     Public Functions
 //******************************************************************************************************************************
-
 	//Keeps track of cube position and kicks off the rest
-	private void CreateMeshData()
+	public void CreateMeshData()
     {
         for (int x = terrainStart[0]; x < terrainEnd[0]; x++)
         {
@@ -77,6 +82,10 @@ public class MarchingChunk
         }
         BuildMesh();
     }
+
+//******************************************************************************************************************************
+//                                                     Private Functions
+//******************************************************************************************************************************
 
 	//Calculates the mesh data inside the current cube
 	private void MarchCube(Vector3Int position)
@@ -162,6 +171,7 @@ public class MarchingChunk
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
+		meshCollider.sharedMesh = mesh;
     }
 
 	//Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
