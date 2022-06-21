@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+//TODO draw better gizmos
+
 //TODO LOD - Octree Marching cubes - Transvoxel
 //TODO Culling - Law of cosines thing
 
