@@ -36,6 +36,7 @@ public class MarchingBody : MonoBehaviour
     
     public float marchingDelay;
     private MarchingChunk[,,] chunks;
+    float chunkSize;
 
     //Terrain
     private float[,,] terrainMap;
@@ -97,7 +98,7 @@ public void PlaceTerrain(Vector3 pos)
     private void GenerateChunks()
     {
         //Calculate size of each chunck based of the selected number of subdivisions
-        float chunkSize = ((float)(radius * 2) / ((float)chunkSubdivisions + 1f));
+        chunkSize = ((float)(radius * 2) / ((float)chunkSubdivisions + 1f));
         if(!Mathf.Approximately(chunkSize, Mathf.Round(chunkSize)))
         {
             Debug.LogWarning("Chunk Subdivisions + 1 must be a multiple of radius*2 (diameter) to render the full body correctly (chunkSize needs to be a whole number)\nChunk Size = " + chunkSize);
@@ -172,5 +173,11 @@ public void PlaceTerrain(Vector3 pos)
         Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(Vector3.zero, radius);
+    }
+
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(chunkSize, chunkSize, chunkSize));
     }
 }
