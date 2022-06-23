@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Create Children
-
+/*
+The OctreeNode class Consists of a single node of an Octree, and each node can manage its own children
+*/
 public class MCOctreeNode
 {
     //Self

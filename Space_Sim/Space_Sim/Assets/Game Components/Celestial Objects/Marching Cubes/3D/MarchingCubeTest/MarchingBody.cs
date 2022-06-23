@@ -33,7 +33,6 @@ public class MarchingBody : MonoBehaviour
     [Header("Chunks")]
     [Range(0,9)][Tooltip("Chunk Subdivisions + 1 must be a multiple of the DIAMETER to render the full sphere")]
     public int chunkSubdivisions;
-    
     public float marchingDelay;
     private MarchingChunk[,,] chunks;
     float chunkSize;

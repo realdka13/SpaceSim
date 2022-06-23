@@ -883,6 +883,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rootSize: 10
+  octreeSubdivions: 1
   drawGizmos: 1
 --- !u!4 &1741080844
 Transform:
