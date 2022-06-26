@@ -21,7 +21,6 @@ public class MCOctree
     private MeshRenderer meshRenderer;
 
     //Settings
-    private float radius;
     private float terrainScaler;
     private bool smoothTerrain;
     private bool flatShaded;
@@ -29,7 +28,10 @@ public class MCOctree
     //Terrain
     private float[,,] terrainMap;
 
-    int cubeSegments;
+    //Size
+    private float radius;
+    private int octreeSubdivions;
+    private int cubeSegments;
 
 //******************************************************************************************************************************
 //                                                     Public Functions
@@ -42,6 +44,7 @@ public class MCOctree
         this.smoothTerrain = smoothTerrain;
         this.flatShaded = flatShaded;
         this.terrainMap = terrainMap;
+        this.octreeSubdivions = octreeSubdivions;
         this.cubeSegments = (int)(Mathf.Pow(2, octreeSubdivions));
 
         //Create Gameobject
@@ -96,21 +99,21 @@ public class MCOctree
         }
     }
 
-    private void MarchCube(Vector3Int position)
+    private void MarchCube(Vector3Int marchPosition)
     {
         //Sample terrain values at each corner of the cube
 		float[] cube = new float[8];
 		for (int i = 0; i < 8; i++)
 		{
-			cube[i] = SampleTerrain(position + MarchingCubeData.CornerTable[i]);
+			cube[i] = SampleTerrain(marchPosition + MarchingCubeData.CornerTable[i]);
 		}
 
         int edgeIndex = 0;
         int configIndex = GetCubeConfiguration(cube);
 
-        if(configIndex == 0 || configIndex == 255){return;}	//If all verts are on, or al verts are off, then just move on, since these wont display anything
+        if(configIndex == 0 || configIndex == 255){return;}	//If all verts are on, or all verts are off, then just move on, since these wont display anything
     
-        for (int i = 0; i < 5; i++) //Never mroe than 5 triangles per mesh
+        for (int i = 0; i < 5; i++) //Never more than 5 triangles per mesh
         {
             for (int j = 0; j < 3; j++) //3 Verts per triangle
             {
@@ -119,9 +122,8 @@ public class MCOctree
                 if(index == -1){return;} // If the current edgeIndex is -1, there are no more indices and we can exit the function
 
 				//Get the vertices for the start and end of this edge.
-                Vector3 vert1 = position + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,0]];
-                Vector3 vert2 = position + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,1]];
-
+                Vector3 vert1 = marchPosition + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,0]];
+                Vector3 vert2 = marchPosition + MarchingCubeData.CornerTable[MarchingCubeData.EdgeIndexes[index,1]];
 
 				//Smooth Terrain
 				Vector3 vertPosition;
@@ -144,14 +146,13 @@ public class MCOctree
 					}
 
 					//Calculate point on edge where terrain passes
-					vertPosition = CenterVerts(vert1 + ((vert2 - vert1) * difference));
+					vertPosition = ConvertToWorldCoords(vert1 + ((vert2 - vert1) * difference));
 				}
 				else
 				{
 					//Get the midpoint of this edge. For non-smooth terrain just get edge midpoint
-                	vertPosition = CenterVerts((vert1 + vert2) / 2f);
+                	vertPosition = ConvertToWorldCoords((vert1 + vert2) / 2f);
 				}
-
 
 				//Flat shading
 				//Add to our vertices and triangles list and incriment the edgeIndex
@@ -178,8 +179,6 @@ public class MCOctree
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
-
-        Debug.Log("Mesh Built! Hopefully...");
     }
 
     //Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
@@ -231,9 +230,10 @@ public class MCOctree
     	return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 
-	private Vector3 CenterVerts(Vector3 vertPosition)
+	private Vector3 ConvertToWorldCoords(Vector3 vertPosition)
 	{
-		return new Vector3(Remap(vertPosition.x,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.y,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.z,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f));
+        Vector3 centeredPosition = new Vector3(Remap(vertPosition.x,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.y,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.z,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f));
+		return ((radius * centeredPosition) / Mathf.Pow(2,(octreeSubdivions - 1)));
 	}
 
 //******************************************************************************************************************************

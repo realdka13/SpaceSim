@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //TODO LOD - Octree Marching cubes - Transvoxel
+    //Clean Code - Add Comments
+    //Move Marching cube mesh creation to Octree node? Use as optimization of octree children??
+    //Chunks
+    //Optimize
 //TODO Culling - Law of cosines thing
 
 //TODO Improve Collision Mesh
@@ -20,14 +24,14 @@ public class MCOOctreeBody : MonoBehaviour
     //Octree
     [Header("Octree")]
     private MCOctree mcOctree;
-    [Range(0,4)]
+    [Range(1,5)]
     public int octreeSubdivions;
 
     //Body Settings
     [Header("Shape")]
     [Tooltip("Length of marching cube area. This is the radius of the body if the terrain scaler is set to 1")]
 	public float radius;
-    [Range(0f,.999f)][Tooltip("Scale of terrain inside of marching cube area")]
+    [Range(0f,1f)][Tooltip("Scale of terrain inside of marching cube area")]
     public float terrainScaler;
 
     [Header("Smoothness")]
@@ -78,6 +82,7 @@ public class MCOOctreeBody : MonoBehaviour
                     float xPer = (float)x / (float)cubeSegments;
                     float yPer = (float)y / (float)cubeSegments;
                     float zPer = (float)z / (float)cubeSegments;
+                    //Debug.Log("Percentages at " + x + ", " + y + ", " + z + "\n" + "xPer: " + xPer + " yPer: " + yPer + " zPer: " + zPer);
 
                     //Remap them to center the sphere correctly
                     xPer = Remap(xPer, 0f, 1f, -1f, 1f);
@@ -86,6 +91,7 @@ public class MCOOctreeBody : MonoBehaviour
 
                     //Equation for a sphere
                     terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+                    //Debug.Log("Remapped (" + x + ", " + y + ", " + z + ")\n" + "xPer: " + xPer + " yPer: " + yPer + " zPer: " + zPer + "\nFinal Value: " + terrainMap[x, y, z]);
                 }
             }
         }
@@ -113,5 +119,7 @@ public class MCOOctreeBody : MonoBehaviour
         {
             mcOctree.DrawBounds(this.transform);
         }
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
     }
 }

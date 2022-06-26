@@ -80,6 +80,7 @@ public void PlaceTerrain(Vector3 pos)
                     float xPer = (float)x / (float)diameter;
                     float yPer = (float)y / (float)diameter;
                     float zPer = (float)z / (float)diameter;
+                    //Debug.Log("Percentages at " + x + ", " + y + ", " + z + "\n" + "xPer: " + xPer + " yPer: " + yPer + " zPer: " + zPer);
 
                     //Remap them to center the sphere correctly
                     xPer = Remap(xPer, 0f, 1f, -1f, 1f);
@@ -88,6 +89,7 @@ public void PlaceTerrain(Vector3 pos)
 
                     //Equation for a sphere
                     terrainMap[x, y, z] = xPer*xPer + yPer*yPer + zPer*zPer;
+                    //Debug.Log("Remapped (" + x + ", " + y + ", " + z + ")\n" + "xPer: " + xPer + " yPer: " + yPer + " zPer: " + zPer + "\nFinal Value: " + terrainMap[x, y, z]);
                 }
             }
         }
@@ -166,17 +168,13 @@ public void PlaceTerrain(Vector3 pos)
 //******************************************************************************************************************************
     void OnDrawGizmosSelected()
     {
-        // Draw a Black cube at the transform position
-        Gizmos.matrix = this.transform.localToWorldMatrix;
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(Vector3.zero, radius);
+
     }
 
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(chunkSize, chunkSize, chunkSize));
+        Gizmos.matrix = this.transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
     }
 }
