@@ -15,23 +15,21 @@ public class MCOctree
 
     //Mesh
     private GameObject mesh;
-
-    //Mesh Components
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
-
-    //Settings
-    private float terrainScaler;
-    private bool smoothTerrain;
-    private bool flatShaded;
 
     //Terrain
     private float[,,] terrainMap;
 
-    //Size
+    //Terrain Size
     private float radius;
+    private float terrainScaler;
     private int octreeSubdivions;
     private int cubeSegments;
+
+    //Terrain Smoothness
+    private bool smoothTerrain;
+    private bool flatShaded;
 
 //******************************************************************************************************************************
 //                                                     Public Functions
@@ -155,7 +153,7 @@ public class MCOctree
 				}
 
 				//Flat shading
-				//Add to our vertices and triangles list and incriment the edgeIndex
+				//Add to our vertices and triangles list and increment the edgeIndex
 				if(flatShaded)
 				{
                 	vertices.Add(vertPosition);
@@ -232,8 +230,11 @@ public class MCOctree
 
 	private Vector3 ConvertToWorldCoords(Vector3 vertPosition)
 	{
+        //Remap to center sphere
         Vector3 centeredPosition = new Vector3(Remap(vertPosition.x,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.y,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f), Remap(vertPosition.z,0f,(float)cubeSegments,((float)cubeSegments / 2f) * -1f,(float)cubeSegments / 2f));
-		return ((radius * centeredPosition) / Mathf.Pow(2,(octreeSubdivions - 1)));
+		
+        //Convert from Indicies to World Coordinates
+        return ((radius * centeredPosition) / Mathf.Pow(2,(octreeSubdivions - 1)));
 	}
 
 //******************************************************************************************************************************

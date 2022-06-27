@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //TODO LOD - Octree Marching cubes - Transvoxel
-    //Clean Code - Add Comments
-    //Move Marching cube mesh creation to Octree node? Use as optimization of octree children??
-    //Chunks
-    //Optimize
+    //LOD
+    //Transvoxel/Transvoxel-like algorithm
 //TODO Culling - Law of cosines thing
+    //Move Marching cube mesh creation (MarchCube function) to Octree node? Use as optimization of octree children??
+
+//Need Chunks???
 
 //TODO Improve Collision Mesh
 //TODO Improve Modifiable Terrain - move to its own script?
@@ -21,18 +22,18 @@ using UnityEngine;
 
 public class MCOOctreeBody : MonoBehaviour
 {
-    //Octree
-    [Header("Octree")]
-    private MCOctree mcOctree;
-    [Range(1,5)]
+    //Octrees
+    [Header("Octrees")]
+    [Range(1,6)]
     public int octreeSubdivions;
+    private MCOctree mcOctree;
 
     //Body Settings
     [Header("Shape")]
     [Tooltip("Length of marching cube area. This is the radius of the body if the terrain scaler is set to 1")]
 	public float radius;
     [Range(0f,1f)][Tooltip("Scale of terrain inside of marching cube area")]
-    public float terrainScaler;
+    public float terrainScaler = .999f;
 
     [Header("Smoothness")]
 	public bool smoothTerrain;
@@ -44,6 +45,7 @@ public class MCOOctreeBody : MonoBehaviour
     //Gizmos
     [Header("Gizmos")]
     public bool drawAllCubes;
+    public bool drawMainCube;
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -82,7 +84,6 @@ public class MCOOctreeBody : MonoBehaviour
                     float xPer = (float)x / (float)cubeSegments;
                     float yPer = (float)y / (float)cubeSegments;
                     float zPer = (float)z / (float)cubeSegments;
-                    //Debug.Log("Percentages at " + x + ", " + y + ", " + z + "\n" + "xPer: " + xPer + " yPer: " + yPer + " zPer: " + zPer);
 
                     //Remap them to center the sphere correctly
                     xPer = Remap(xPer, 0f, 1f, -1f, 1f);
@@ -120,6 +121,9 @@ public class MCOOctreeBody : MonoBehaviour
             mcOctree.DrawBounds(this.transform);
         }
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
+        if(drawMainCube)
+        {
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(radius * 2, radius * 2, radius * 2));
+        }
     }
 }

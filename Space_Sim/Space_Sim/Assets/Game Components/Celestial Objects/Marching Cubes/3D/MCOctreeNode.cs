@@ -48,7 +48,7 @@ public class MCOctreeNode
         return children;
     }
 
-    //Draw Boxes
+    //Draw Boxes - starts with the root transform and recursively cycles through all children in the octree until they are all drawn
     public void DrawBounds(Transform rootTransform)
     {
         Gizmos.matrix = rootTransform.localToWorldMatrix;

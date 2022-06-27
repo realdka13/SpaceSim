@@ -2,21 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-//TODO draw better gizmos
-
-//TODO LOD - Octree Marching cubes - Transvoxel
-//TODO Culling - Law of cosines thing
-
-//TODO Improve Collision Mesh
-//TODO Improve Modifiable Terrain - move to its own script?
-
-//TODO Save terrain when loading/unloading
-
-//TODO Move rendering to GPU
-
-//TODO Shows (whole) body in editor/Actively changes
-//TODO Decorate!
-
 public class MarchingBody : MonoBehaviour
 {
 	//Settings
@@ -35,7 +20,7 @@ public class MarchingBody : MonoBehaviour
     public int chunkSubdivisions;
     public float marchingDelay;
     private MarchingChunk[,,] chunks;
-    float chunkSize;
+    private float chunkSize;
 
     //Terrain
     private float[,,] terrainMap;
