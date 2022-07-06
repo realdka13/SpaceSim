@@ -132,4 +132,4 @@ MonoBehaviour:
   verticalSpeed: 0.5
   xyRotationSpeed: 30
   zRotationSpeed: 100
-  terraformDistance: 10
+  terraformDistance: 50

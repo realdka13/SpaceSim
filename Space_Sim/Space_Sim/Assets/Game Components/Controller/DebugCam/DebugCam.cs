@@ -80,7 +80,7 @@ public class DebugCam : MonoBehaviour
             {
                 if(hit.transform.tag == "Terrain")
                 {
-                    hit.transform.parent.GetComponent<MarchingBody>().PlaceTerrain(hit.point);
+                    hit.transform.parent.GetComponent<MCOOctreeBody>().PlaceTerrain(hit.point);
                 }
             }
         }

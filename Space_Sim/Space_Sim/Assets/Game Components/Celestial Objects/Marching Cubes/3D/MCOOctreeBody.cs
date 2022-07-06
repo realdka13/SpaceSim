@@ -10,8 +10,8 @@ using UnityEngine;
 
 //Need Chunks???
 
-//TODO Improve Collision Mesh
-//TODO Improve Modifiable Terrain - move to its own script?
+//TODO Collision Mesh
+//TODO Modifiable Terrain - move to its own script?
 
 //TODO Save terrain when loading/unloading
 
@@ -42,10 +42,27 @@ public class MCOOctreeBody : MonoBehaviour
     //Terrain
     private float[,,] terrainMap;
 
+    //Rendering
+    [Header("Render - INACTIVE")]
+    public bool culling;
+    public float cullingAngle = 90f;
+
     //Gizmos
     [Header("Gizmos")]
     public bool drawAllCubes;
     public bool drawMainCube;
+
+//******************************************************************************************************************************
+//                                                     Public Functions
+//******************************************************************************************************************************
+public void PlaceTerrain(Vector3 pos)
+{
+    Vector3Int v3Int = new Vector3Int(Mathf.CeilToInt(pos.x), Mathf.CeilToInt(pos.y), Mathf.CeilToInt(pos.z));
+    //terrainMap[v3Int.x, v3Int.y, v3Int.z] = 0f;
+    //mcOctree.GenerateMesh();
+    Debug.Log("Regenerating Meshes");
+}
+
 
 //******************************************************************************************************************************
 //                                                     Private Functions
@@ -70,6 +87,14 @@ public class MCOOctreeBody : MonoBehaviour
         //Error handling (Checks if Size or Terrain Scaler is invalid and sends a warning)
         if(radius == 0){Debug.LogWarning("Radius = 0");}
         if(terrainScaler == 0){Debug.LogWarning("Terrain Scaler = 0");}
+    }
+
+    private void Update()
+    {
+        //Update Culling - TODO put in IEnumerator to not check every single frame
+        //If culling is true, calculate
+        //If culling false, and changeed last frame, calculate full mesh
+        //Else do nothing
     }
 
     private void PopulateTerrainMap(int cubeSegments)

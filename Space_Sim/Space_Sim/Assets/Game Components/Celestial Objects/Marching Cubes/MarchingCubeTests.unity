@@ -882,11 +882,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b39e9c37c9e1962469e3c7154caab1d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  octreeSubdivions: 6
+  octreeSubdivions: 5
   radius: 50
   terrainScaler: 0.999
-  smoothTerrain: 1
-  flatShaded: 0
+  smoothTerrain: 0
+  flatShaded: 1
+  culling: 0
+  cullingAngle: 90
   drawAllCubes: 0
   drawMainCube: 1
 --- !u!4 &1741080844

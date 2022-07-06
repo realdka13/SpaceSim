@@ -14,9 +14,10 @@ public class MCOctree
     private List<int> triangles = new List<int>();
 
     //Mesh
-    private GameObject mesh;
+    private GameObject meshObj;
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+    private MeshCollider meshCollider;
 
     //Terrain
     private float[,,] terrainMap;
@@ -46,18 +47,20 @@ public class MCOctree
         this.cubeSegments = (int)(Mathf.Pow(2, octreeSubdivions));
 
         //Create Gameobject
-        mesh = new GameObject();
-        mesh.transform.SetParent(rootTransform);
-        mesh.name = "mesh";
-        mesh.transform.position = rootTransform.position;
-        mesh.transform.rotation = rootTransform.rotation;
+        meshObj = new GameObject();
+        meshObj.transform.SetParent(rootTransform);
+        meshObj.name = "mesh";
+        meshObj.transform.tag = "Terrain";
+        meshObj.transform.position = rootTransform.position;
+        meshObj.transform.rotation = rootTransform.rotation;
 
         //Create mesh gameobject componenets
-        meshFilter = mesh.AddComponent<MeshFilter>();
-        meshRenderer = mesh.AddComponent<MeshRenderer>();
+        meshFilter = meshObj.AddComponent<MeshFilter>();
+        meshRenderer = meshObj.AddComponent<MeshRenderer>();
+        meshCollider = meshObj.AddComponent<MeshCollider>();
 
         //Set mesh color
-        mesh.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
+        meshObj.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
 
         //Create root node
         rootNode = new MCOctreeNode(radius * 2, rootTransform.position);
@@ -177,6 +180,7 @@ public class MCOctree
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
     }
 
     //Figure out which cube mesh configuration to use, cube[] are each vertex of the cube
